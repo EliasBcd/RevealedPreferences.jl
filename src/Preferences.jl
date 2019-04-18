@@ -1,5 +1,3 @@
-using LightGraphs
-
 ## Definition of type aliases, to avoir writing Dict of Vector.
 
 ChoiceFunction{T} = Dict{Vector{T}, T} where T <:Int
@@ -17,7 +15,11 @@ mutable struct WeightedDiGraph{T<:Int}
     weights::Matrix{Float64}
 end
 
-WeightedDiGraph(n::Int) =  WeightedDiGraph(DiGraph{Int}(n), zeros(Float64, n, n))
+function WeightedDiGraph(n::T) where T <: Int
+    dg = DiGraph{T}(n)
+    we = zeros(Float64, n, n)
+    return WeightedDiGraph(dg, we)
+end
 
 weights(wdg::WeightedDiGraph) = wdg.weights
 
@@ -75,7 +77,7 @@ function revealedpreferencesweighted(cf::ChoiceFunction{Int}; n::Int = 0)
             weights(result)[value, i] += 1
         end
     end
-    @assert !(sum(weights(result)) == nchoices) "The weights in the revealed preference graph do not add up to $nchoices. PROBLEM."    
+    @assert !(sum(weights(result)) == n) "The weights in the preference graph do not add up to $n. PROBLEM."    
     weights(result) = weights(result) ./ nchoices
     return result
 end
