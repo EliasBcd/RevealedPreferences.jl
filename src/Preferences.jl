@@ -78,7 +78,7 @@ function revealedpreferencesweighted(cf::ChoiceFunction{Int}; n::Int = 0)
         end
     end
     @assert !(sum(weights(result)) == n) "The weights in the preference graph do not add up to $n. PROBLEM."    
-    RevealedPreferences.weights(result) = RevealedPreferences.weights(result) ./ nchoices
+    result.weights = result.weights ./ nchoices
     return result
 end
 
