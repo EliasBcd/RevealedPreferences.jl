@@ -74,11 +74,11 @@ function revealedpreferencesweighted(cf::ChoiceFunction{Int}; n::Int = 0)
         for i in key
             i == value && continue
             add_edge!(digraph(result), value, i)
-            weights(result)[value, i] += 1
+            RevealedPreferences.weights(result)[value, i] += 1
         end
     end
     @assert !(sum(weights(result)) == n) "The weights in the preference graph do not add up to $n. PROBLEM."    
-    weights(result) = weights(result) ./ nchoices
+    RevealedPreferences.weights(result) = RevealedPreferences.weights(result) ./ nchoices
     return result
 end
 

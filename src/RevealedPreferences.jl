@@ -5,7 +5,6 @@ using IterTools: subsets
 using DataFrames: DataFrame
 
 import GLPK
-import Base.weights
 
 export ChoiceFunction, ChoiceCorrespondence,  WeightedDiGraph, weights, digraph, setoflaternatives, revealedpreferences, revealedpreferencesweighted, transitivecore, strictUCR,  allchoicesets, allcombinationchoicesets, cyclesbylength, HMI, swapindex, welfareoptimal
 
