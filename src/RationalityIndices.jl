@@ -126,16 +126,16 @@ function cyclesbylength(dg::DiGraph; pref::AbstractString = "RP")
 end
 
 """
-```HMI(cf:ChoiceFunction{Int})```
+```HMI(cf::ChoiceFunction{T}, removablesets::Vector{Vector{Vector{T}}}) where T <: Int```
 
-Compute the Houtman-Maks Index (1985) with brute force, when the set of all alternatives is made of 4 alternatives.
+Compute the Houtman-Maks Index (1985) with brute force, conditional on providing the set of removable alternatives beforehand.
 Use a brute force algorithm to do so.
 
 # Arguments:
 
 - `cf`: The choice function that is used to computed the Houtman-Maks index.
 """
-function HMI(cf::ChoiceFunction{T}, removablesets::Vector{Vector{Vector{T}}}) where T<:Int
+function HMI(cf::ChoiceFunction{T}, removablesets::Vector{Vector{Vector{T}}}) where T <: Int
     rp = RP(cf)
     if !is_cyclic(rp)
         return 0.
