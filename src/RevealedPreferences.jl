@@ -2,6 +2,7 @@ module RevealedPreferences
 
 using LightGraphs
 using IterTools: subsets
+using DataFrames: DataFrame
 
 import GLPK
 
