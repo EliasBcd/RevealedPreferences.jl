@@ -87,7 +87,9 @@ function revealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
     result = DiGraph(n)
     for (key, value) in cf
         for i in key
-            i == value && continue
+            if i == value
+		continue
+            end
             add_edge!(result, value, i)
         end
     end
@@ -137,7 +139,6 @@ function indifferentrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0)
     elseif n < 0
 	DomainError(n, "should be positive.")
     end  
-    dg = strictrevealedpreferences(cc,   
     result = Graph(n)
     for cS in values(cc)
 	for x in cS,  y in cS
