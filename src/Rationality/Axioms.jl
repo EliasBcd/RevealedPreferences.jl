@@ -335,11 +335,9 @@ function isFA(cc::ChoiceCorrespondence{T}, ndg::Int = 0) where T <: Int
     end
     dg = DiGraph(ndg)
     for (S, cS) in cc
-        for x in cS, 
-	    for y in S
-		if !in(y, cS)
-		    add_edge!(dg, x, y)
-		end
+        for x in cS, y in S
+	    if !in(y, cS)
+		add_edge!(dg, x, y)
 	    end
         end
     end
