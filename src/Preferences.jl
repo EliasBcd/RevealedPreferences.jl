@@ -12,7 +12,7 @@ ChoiceFunction{T} = Dict{Vector{T}, T} where T <:Int
 
 Wrapper to define a choice correspondence.
 """
-ChoiceCorrespondence{T} = Dict{Vector{T}, Vector{T}} where T <:Int # Useless for now.
+ChoiceCorrespondence{T} = Dict{Vector{T}, Vector{T}} where T <:Int
 
 """
 ```WeightedDiGraph{T<:Int}```
