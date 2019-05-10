@@ -69,7 +69,7 @@ function setoflaternatives(cf::ChoiceFunction{T}) where T <: Int
 end
 
 """
-```revealedpreferences(cf::ChoiceFunction{Int}; n::Int = 0) where T <: Int```
+```revealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int```
 
 Create the revealed preferences from an observed choice function.
 
@@ -78,7 +78,7 @@ Create the revealed preferences from an observed choice function.
 - `cf`, a choice function.
 - `n` the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
-function revealedpreferences(cf::ChoiceFunction{T}; n::Int = 0) where T <: Int
+function revealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
     if n == 0
         n = setoflaternatives(cf)
     elseif n < 0
@@ -92,6 +92,82 @@ function revealedpreferences(cf::ChoiceFunction{T}; n::Int = 0) where T <: Int
         end
     end
     return result
+end
+
+"""
+```strictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int```
+
+Create the strict revealed preferences from an observed choice correspondence.
+
+# Arguments
+
+- `cc`, a choice function.
+- `n` the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
+"""
+function strictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
+    if n == 0
+        n = setoflaternatives(cc)
+    elseif n < 0
+	DomainError(n, "should be positive.")
+    end    
+    result = DiGraph(n)
+    for (S, cS) in cc
+	for x in cS,  y in S
+	    if !in(y, cS)
+		add_edge!(result, x, y)
+            end
+        end
+    end
+    return result
+end
+
+"""
+```strictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int```
+
+Create the revealed indifferences from an observed choice correspondence.
+
+# Arguments
+
+- `cc`, a choice function.
+- `n` the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
+"""
+function indifferentrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
+    if n == 0
+        n = setoflaternatives(cc)
+    elseif n < 0
+	DomainError(n, "should be positive.")
+    end  
+    dg = strictrevealedpreferences(cc,   
+    result = Graph(n)
+    for cS in values(cc)
+	for x in cS,  y in cS
+	    if !(x == y)
+		add_edge!(result, x, y)
+            end
+        end
+    end
+    return result
+end
+
+"""
+```revealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int```
+
+Create the revealed preferences from an observed choice correspondence, including indifference and strict preferences.
+
+# Arguments
+
+- `cc`, a choice correspondence.
+- `n` the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
+"""
+function revealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
+    if n == 0
+        n = setoflaternatives(cc)
+    elseif n < 0
+	DomainError(n, "should be positive.")
+    end  
+    dg = strictrevealedpreferences(cc, n)
+    g = indifferentrevealedpreferences(cc, n)  
+    return dg, g
 end
 
 """
