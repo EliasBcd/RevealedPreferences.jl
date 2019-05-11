@@ -71,18 +71,26 @@ function swapindex(wdg::WeightedDiGraph)
 end
 
 """
-```allchoicesets(n::Int)```
+```allchoicesets(n::Int, floor::Int = 2)```
 
-Compute all choice sets for a given number of alternatives.
+Compute all choice sets of size larger than `floor` for a given number of alternatives.
 
 # Arguments
 
 - `n`: the number of alternatives. 
+- `floor`: minimal size of the choice sets. Default to 2.
 """
-function allchoicesets(n::Int)
+function allchoicesets(n::Int, floor::Int = 2)
+	if floor < 0
+		DomainError(floor, "should be positive.")
+    elseif n < floor
+		DomainError(n, "should be greater or equal than floor $floor.")
+	end
     result = Vector{Vector{Int}}()
-    for i in 2:n
-        append!(result, collect(subsets(1:n, i)))
+	X = collect(1:n)
+	append!(result, X)
+    for i in floor:(n-1)
+        append!(result, collect(subsets(X, i)))
     end
     return result
 end

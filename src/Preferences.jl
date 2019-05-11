@@ -82,7 +82,7 @@ function revealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
     if n == 0
         n = setoflaternatives(cf)
     elseif n < 0
-	DomainError(n, "should be positive.")
+		DomainError(n, "should be positive.")
     end    
     result = DiGraph(n)
     for (key, value) in cf
@@ -110,7 +110,7 @@ function strictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) wher
     if n == 0
         n = setoflaternatives(cc)
     elseif n < 0
-	DomainError(n, "should be positive.")
+		DomainError(n, "should be positive.")
     end    
     result = DiGraph(n)
     for (S, cS) in cc
