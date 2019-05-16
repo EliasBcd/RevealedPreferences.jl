@@ -82,13 +82,13 @@ function revealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
     if n == 0
         n = setoflaternatives(cf)
     elseif n < 0
-		DomainError(n, "should be positive.")
+        DomainError(n, "should be positive.")
     end    
     result = DiGraph(n)
     for (key, value) in cf
         for i in key
             if !(i == value)
-				add_edge!(result, value, i)
+                add_edge!(result, value, i)
             end
         end
     end
@@ -109,19 +109,19 @@ function weakstrictrevealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where 
     if n == 0
         n = setoflaternatives(cf)
     elseif n < 0
-		DomainError(n, "should be positive.")
+        DomainError(n, "should be positive.")
     end    
     P = DiGraph(n)
-	I = Graph(n)
+    I = Graph(n)
     for (S, cS) in cf
         for y in S
             if cS == y
-				continue
+                continue
             elseif has_edge(P, y, cS)
                 add_edge!(I, cS, y)
                 rem_edge!(P, y, cS)
-			elseif !has_edge(I, cS, y)
-				add_edge!(P, cS, y)
+            elseif !has_edge(I, cS, y)
+                add_edge!(P, cS, y)
             end
         end
     end
@@ -142,23 +142,23 @@ function weakstrictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) 
     if n == 0
         n = setoflaternatives(cc)
     elseif n < 0
-		DomainError(n, "should be positive.")
+        DomainError(n, "should be positive.")
     end    
     P = DiGraph(n)
-	I = Graph(n)
+    I = Graph(n)
     for (S, cS) in cc
         for y in S, x in cS
             if x == y
-				continue
-			elseif in(y, cS)
+                continue
+            elseif in(y, cS)
                 add_edge!(I, x, y)
                 rem_edge!(P, x, y)
                 rem_edge!(P, y, x)
             elseif has_edge(P, y, x)
                 add_edge!(I, x, y)
                 rem_edge!(P, y, x)
-			elseif !has_edge(I, x, y)
-				add_edge!(P, x, y)
+            elseif !has_edge(I, x, y)
+                add_edge!(P, x, y)
             end
         end
     end
@@ -179,13 +179,13 @@ function strictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) wher
     if n == 0
         n = setoflaternatives(cc)
     elseif n < 0
-		DomainError(n, "should be positive.")
+        DomainError(n, "should be positive.")
     end    
     result = DiGraph(n)
     for (S, cS) in cc
-	for x in cS,  y in S
-	    if !in(y, cS)
-		add_edge!(result, x, y)
+        for x in cS,  y in S
+            if !in(y, cS)
+                add_edge!(result, x, y)
             end
         end
     end
@@ -206,13 +206,13 @@ function indifferentrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0)
     if n == 0
         n = setoflaternatives(cc)
     elseif n < 0
-	DomainError(n, "should be positive.")
+        DomainError(n, "should be positive.")
     end  
     result = Graph(n)
     for cS in values(cc)
-	for x in cS,  y in cS
-	    if !(x == y)
-		add_edge!(result, x, y)
+        for x in cS,  y in cS
+            if !(x == y)
+                add_edge!(result, x, y)
             end
         end
     end
@@ -233,11 +233,11 @@ function revealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <:
     if n == 0
         n = setoflaternatives(cc)
     elseif n < 0
-	DomainError(n, "should be positive.")
+        DomainError(n, "should be positive.")
     end  
-    dg = strictrevealedpreferences(cc, n)
-    g = indifferentrevealedpreferences(cc, n)  
-    return dg, g
+    P = strictrevealedpreferences(cc, n)
+    I = indifferentrevealedpreferences(cc, n)  
+    return P, I
 end
 
 """
@@ -254,7 +254,7 @@ function revealedpreferencesweighted(cf::ChoiceFunction{T}; n::Int = 0) where T 
     if n == 0
         n = setoflaternatives(cf)
     elseif n < 0
-	DomainError(n, "should be positive.")
+        DomainError(n, "should be positive.")
     end    
     result = WeightedDiGraph(n)
     for (key, value) in cf
@@ -284,7 +284,7 @@ function transitivecore(dg::DiGraph; n::Int = 0)
     if n == 0
         n = nv(dg)
     elseif n < 0
-	DomainError(n, "should be positive.")
+        DomainError(n, "should be positive.")
     end
     tc = DiGraph(n)
     for e in edges(dg)
@@ -311,7 +311,7 @@ function strictUCR(cf::ChoiceFunction{Int}; n::Int = 0)
     if n == 0
         n = setoflaternatives(cf)
     elseif n < 0
-	DomainError(n, "should be positive.")
+        DomainError(n, "should be positive.")
     end    
     result = DiGraph(n)
     forbidden = Set{Tuple{Int, Int}}()

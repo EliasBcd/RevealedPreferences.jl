@@ -81,11 +81,11 @@ Compute all choice sets of size larger than `floor` for a given number of altern
 - `floor`: minimal size of the choice sets. Default to 2.
 """
 function allchoicesets(n::Int, floor::Int = 2)
-	if floor < 0
-		DomainError(floor, "should be positive.")
+    if floor < 0
+        DomainError(floor, "should be positive.")
     elseif n < floor
-		DomainError(n, "should be greater or equal than floor $floor.")
-	end
+        DomainError(n, "should be greater or equal than floor $floor.")
+    end
     X = collect(1:n)
     result = [X]
     for i in floor:(n-1)

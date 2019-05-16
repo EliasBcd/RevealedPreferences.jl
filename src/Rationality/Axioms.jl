@@ -10,12 +10,11 @@ Return whether a choice correspondence verify the Weak Axiom of Revealed Prefere
 function isWARP(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
         for x in S, y in cS
-            if x == y 
-		continue
-	    end
-            for (U, cU) in cc
-                if in(y, U) & in(x, cU) & !in(y, cU) 
-                    return false
+            if !(x == y)
+                for (U, cU) in cc
+                    if in(y, U) & in(x, cU) & !in(y, cU) 
+                        return false
+                    end
                 end
             end
         end
@@ -35,14 +34,13 @@ Check whether a choice correspondence violate the ALPHA axiom (aka H, the Heredi
 """
 function isalpha(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
-	if length(S) == 2
-	    continue
-	end
-        for x in cS
-            for (U, cU) in cc
-                if issubset(U, S) & in(x, U) & !in(x, cU) 
-		    return false
-		end
+        if length(S) > 2
+            for x in cS
+                for (U, cU) in cc
+                    if issubset(U, S) & in(x, U) & !in(x, cU) 
+                        return false
+                    end
+                end
             end
         end
     end
@@ -60,19 +58,16 @@ Check whether a choice correspondence violate the BETA axiom.
 """
 function isbeta(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
-	if length(cS) == 1
-	    continue
-	end
-        for (U, cU) in cc
-            if (S == U) | !issubset(S, U)
-		continue
-	    end
-            for x in cS, y in cS
-                if x == y
-		    continue
-		elseif in(x, cU) & !in(y, cU)
-		    return false
-		end
+        if length(cS) > 1
+            for (U, cU) in cc
+                if (S == U) | !issubset(S, U)
+                    continue
+                end
+                for x in cS, y in cS
+                    if in(x, cU) & !in(y, cU)
+                        return false
+                    end
+                end
             end
         end
     end
@@ -90,11 +85,16 @@ Check whether a choice correspondence violate the DELTA axiom.
 """
 function isdelta(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
-        length(cS) == 1 && continue
-        for (U, cU) in cc
-            ((S == U) | !issubset(S, U)) && continue
-            for x in cS
-                [x] == cU && return false
+        if length(cS) > 1
+            for (U, cU) in cc
+                if (S == U) | !issubset(S, U)
+                    continue
+                end
+                for x in cS
+                    if [x] == cU 
+                        return false
+                    end
+                end
             end
         end
     end
@@ -117,8 +117,8 @@ function isgamma(cc::ChoiceCorrespondence{T}) where T <: Int
         S = pop!(Ss)
         for U in Ss
             if !issubset(intersect(cc[S], cc[U]), cc[sort(union(S, U))]) 
-		return false
-	    end
+                return false
+            end
         end
     end
     return true
@@ -136,20 +136,20 @@ Check whether WARNI is verified by a choice correspondence.
 function isWARNI(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
         for y in S
-	    if in(y, cS) 
-		continue
-	    end
+            if in(y, cS) 
+                continue
+            end
             chosenxs = falses(size(cS))
             for (i,x) in enumerate(cS)
                 for (U, cU) in cc
                     if in(y, cU) & in(x, U)
-			chosenxs[i] = true
-		    end
+                        chosenxs[i] = true
+                    end
                 end
             end
-	    if chosenxs == trues(size(cS))
-		return false
-	    end
+            if chosenxs == trues(size(cS))
+                return false
+            end
         end
     end
     return true
@@ -167,11 +167,11 @@ Check whether the Outcast axiom is verified by a choice correspondence.
 function isoutcast(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
         for (U, cU) in cc
-	    if !issubset(U, S) | !issubset(cS, U) 
-		continue
-	    elseif !(cS == cU)
-		return false
-	    end
+            if !issubset(U, S) | !issubset(cS, U) 
+                continue
+            elseif !(cS == cU)
+                return false
+            end
         end
     end
     return true
@@ -192,8 +192,8 @@ function isFAs(cc::ChoiceCorrespondence{T}) where T <: Int
         S = pop!(Ss)
         for U in Ss    
             if !isempty(intersect(cc[S], setdiff(U, cc[U]))) & !isempty(intersect(cc[U], setdiff(S, cc[S]))) 
-		return false
-	    end
+                return false
+            end
         end
     end
     return true
@@ -211,15 +211,15 @@ Is the Jamison Lau Fishburn condition verified?
 function isJLF(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
         for (U, cU) in cc
-	    if (length(U) == 2) | (S == U) | !issubset(S, setdiff(U, cU))
-		continue
-	    end
+            if (length(U) == 2) | (S == U) | !issubset(S, setdiff(U, cU))
+                continue
+            end
             for (U, cU) in cc
-		if (U == U) | (S == U) | isempty(intersect(cU, U))
-		    continue
-		elseif !isempty(intersect(setdiff(S, cS),  cU))
-	  	    return false
-		end
+                if (U == U) | (S == U) | isempty(intersect(cU, U))
+                    continue
+                elseif !isempty(intersect(setdiff(S, cS),  cU))
+                    return false
+                end
             end
         end
     end
@@ -243,33 +243,33 @@ function isOO(cc::ChoiceCorrespondence{T}) where T <: Int
             OOx = true
             for (U, cU) in cc
                 if in(x, U) & !isempty(intersect(cU, S)) & !in(x, cU)
-			OOx = false
-		end
+                    OOx = false
+                end
             end
             if OOx
                 for(U, cU) in cc
                     if !in(x, U)
-			continue
-		    end
+                        continue
+                    end
                     for y in S
                         if !in(y, U) & !issubset(cU, cc[sort(union(U, y))]) 
-			    OOx = false
-			    break
-			end
+                            OOx = false
+                            break
+                        end
                     end
                     if !OOx 
-			break
-		    end
+                        break
+                    end
                 end
             end
             if OOx 
-		OOS = true
-		break
+                OOS = true
+                break
             end
         end        
         if !OOS 
-	    return false
-	end
+            return false
+        end
     end
     return true
 end     
@@ -288,27 +288,27 @@ function isFP(cc::ChoiceCorrespondence{T}) where T <: Int
     Ss = collect(keys(cc))
     while !isempty(Ss)
         S = pop!(Ss)
-	if length(S) == 2
-	    continue
-	end
+        if length(S) == 2
+            continue
+        end
         FP = false
         for x in cc[S]
             FPx = true
             for (U, cU) in cc
-		if !issubset(U, S) | (U == S) 
-		    continue
-		elseif in(x, U) & !in(x, cU) 
-		    FPx = false
-		end
+                if !issubset(U, S) | (U == S) 
+                    continue
+                elseif in(x, U) & !in(x, cU) 
+                    FPx = false
+                end
             end
-	    if FPx
-		FP = true
-		break
-	    end
+            if FPx
+                FP = true
+                break
+            end
         end
-	if !FP
+        if !FP
             return false
-	end
+        end
     end
     return true 
 end
@@ -336,9 +336,9 @@ function isFA(cc::ChoiceCorrespondence{T}, ndg::Int = 0) where T <: Int
     dg = DiGraph(ndg)
     for (S, cS) in cc
         for x in cS, y in S
-	    if !in(y, cS)
-		add_edge!(dg, x, y)
-	    end
+            if !in(y, cS)
+                add_edge!(dg, x, y)
+            end
         end
     end
     return !is_cyclic(dg)
