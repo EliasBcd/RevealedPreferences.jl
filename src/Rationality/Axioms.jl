@@ -22,6 +22,53 @@ function isWARP(cc::ChoiceCorrespondence{T}) where T <: Int
     return true
 end
 
+"""
+```isacyclic(dg::DiGraph{T}, g::Graph{T}) where T <: Int```
+
+Check whether a preference relation is acyclic. 
+
+# Arguments
+
+- `dg` represents the strict part of the preference relation;
+- `g` represents the indifference part of the preference relation.
+"""
+function isacyclic(dg::DiGraph{T}, g::Graph{T}) where T <: Int
+    P = transitiveclosure(dg)
+    if is_cyclic(P)
+        return false
+    end
+    I = DiGraph(g)
+    R = union(P, I)
+    transitiveclosure!(R)
+    cycles = simplecycles(R)
+    for cyc in cycles
+        push!(cyc, cyc[1])
+        for i in 1:(length(cyc) - 1) 
+            if has_edge(P, Edge(cyc[i], cyc[i+1])) 
+                return false
+            end
+        end
+    end
+    return true
+end
+
+
+"""
+```isacyclic(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int```
+
+Return whether a choice function is acyclic, by computing first its weak and strict revealed preferences.
+
+# Arguments
+
+- `cf` is the choice function to check;
+- `n` is the number of alternatives in the set of alternatives. Defaults to 0 if not given, and will be computed, which is slower.
+"""
+function isacyclic(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
+    dg, g = weakstrictrevealedpreferences(cf, n)
+    return isacyclic(dg, g)
+end
+    
+
 
 """
 ```isalpha(cc::ChoiceCorrespondence{T}) where T <: Int```
