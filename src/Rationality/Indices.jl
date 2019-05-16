@@ -86,9 +86,8 @@ function allchoicesets(n::Int, floor::Int = 2)
     elseif n < floor
 		DomainError(n, "should be greater or equal than floor $floor.")
 	end
-    result = Vector{Vector{Int}}()
-	X = collect(1:n)
-	append!(result, X)
+    X = collect(1:n)
+    result = [X]
     for i in floor:(n-1)
         append!(result, collect(subsets(X, i)))
     end
