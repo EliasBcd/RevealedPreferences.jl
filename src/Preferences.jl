@@ -71,7 +71,7 @@ end
 """
 ```revealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int```
 
-Create the revealed preferences from an observed choice function.
+Create the revealed preferences from an observed choice function, assuming that the preferences revealed are strict.
 
 # Arguments
 
@@ -87,13 +87,82 @@ function revealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
     result = DiGraph(n)
     for (key, value) in cf
         for i in key
-            if i == value
-		continue
+            if !(i == value)
+				add_edge!(result, value, i)
             end
-            add_edge!(result, value, i)
         end
     end
     return result
+end
+
+"""
+```weakstrictrevealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int```
+
+Create the revealed preferences from an observed choice function. It assumes that if in the choice function, we have a set were x in chosen and y was available, and a set where y is chosen and x is available, then x and y are indifferent.
+
+# Arguments
+
+- `cf`, a choice function.
+- `n` the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
+"""
+function weakstrictrevealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
+    if n == 0
+        n = setoflaternatives(cf)
+    elseif n < 0
+		DomainError(n, "should be positive.")
+    end    
+    P = DiGraph(n)
+	I = Graph(n)
+    for (S, cS) in cf
+        for y in S
+            if cS == y
+				continue
+            elseif has_edge(P, y, cS)
+                add_edge!(I, cS, y)
+                rem_edge!(P, y, cS)
+			elseif !has_edge(I, cS, y)
+				add_edge!(P, cS, y)
+            end
+        end
+    end
+    return P, I
+end
+
+"""
+```weakstrictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int```
+
+Create the revealed preferences from an observed choice function. It assumes that if in the choice correspondence, we have a set were x in chosen and y was available, and a set where y is chosen and x is available, then x and y are indifferent.
+
+# Arguments
+
+- `cf`, a choice function.
+- `n` the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
+"""
+function weakstrictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
+    if n == 0
+        n = setoflaternatives(cc)
+    elseif n < 0
+		DomainError(n, "should be positive.")
+    end    
+    P = DiGraph(n)
+	I = Graph(n)
+    for (S, cS) in cc
+        for y in S, x in cS
+            if x == y
+				continue
+			elseif in(y, cS)
+                add_edge!(I, x, y)
+                rem_edge!(P, x, y)
+                rem_edge!(P, y, x)
+            elseif has_edge(P, y, x)
+                add_edge!(I, x, y)
+                rem_edge!(P, y, x)
+			elseif !has_edge(I, x, y)
+				add_edge!(P, x, y)
+            end
+        end
+    end
+    return P, I
 end
 
 """
