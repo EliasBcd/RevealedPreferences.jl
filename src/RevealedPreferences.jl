@@ -6,7 +6,7 @@ using DataFrames: DataFrame
 
 import GLPK
 
-export ChoiceFunction, ChoiceCorrespondence, WeightedDiGraph, weights, digraph, setoflaternatives, revealedpreferences, strictrevealedpreferences, indifferencerevealedpreferences, revealedpreferencesweighted, weakstrictrevealedpreferences, transitivecore, strictUCR,  allchoicesets, allcombinationchoicesets, cyclesbylength, HMI, swapindex, optimalset, isWARP, isWARNI, isoutcast, isFAs, isFP, isOO, isalpha, isbeta, isgamma, isdelta, isJLF, isFA, isacyclic
+export ChoiceFunction, ChoiceCorrespondence, WeightedDiGraph, weights, digraph, setoflaternatives, revealedpreferences, strictrevealedpreferences, indifferencerevealedpreferences, revealedpreferencesweighted, weakstrictrevealedpreferences, transitivecore, strictUCR,  allchoicesets, allcombinationchoicesets, cyclesbylength, HMI, swapindex, optimalset, isWARP, isWARNI, isoutcast, isFAs, isFP, isOO, isalpha, isbeta, isgamma, isdelta, isJLF, isFA, isacyclic, fixedpointpreferences
 
 include("Preferences.jl")
 include("Rationality/Indices.jl")

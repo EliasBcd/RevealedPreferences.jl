@@ -241,7 +241,7 @@ function revealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <:
 end
 
 """
-```revealedpreferencesweighted(cf::ChoiceFunction{T}; n::Int = 0) where T <: Int```
+```revealedpreferencesweighted(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int```
 
 Create the revealed preferences from an observed choice function, weighting each relation by its frequency.
 
@@ -250,7 +250,7 @@ Create the revealed preferences from an observed choice function, weighting each
 - `cf`, a choice function.
 - `n` the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
-function revealedpreferencesweighted(cf::ChoiceFunction{T}; n::Int = 0) where T <: Int
+function revealedpreferencesweighted(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
     if n == 0
         n = setoflaternatives(cf)
     elseif n < 0
@@ -270,7 +270,7 @@ function revealedpreferencesweighted(cf::ChoiceFunction{T}; n::Int = 0) where T 
 end
 
 """
-```transitivecore(dg::DiGraph)```
+```transitivecore(dg::DiGraph,  n::Int = 0)```
 
 Compute the transitive core of a directed graph.
 To speed-up computations, provide `n`, the number of alternatives.
@@ -280,7 +280,7 @@ To speed-up computations, provide `n`, the number of alternatives.
 - `dg` a digraph from which we will build the transitive core.
 - `n` the number of alternatives. If no value is provided, use the size of the original graph.
 """
-function transitivecore(dg::DiGraph; n::Int = 0)
+function transitivecore(dg::DiGraph, n::Int = 0)
     if n == 0
         n = nv(dg)
     elseif n < 0
@@ -297,7 +297,7 @@ function transitivecore(dg::DiGraph; n::Int = 0)
 end
 
 """
-```strictUCR(cf::ChoiceFunction{Int}; n::Int = 0)```
+```strictUCR(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int```
 
 Create the Strict UCR graph from an observed choice function.
 To speed-up computations, provide `n`, the number of alternatives.
@@ -307,7 +307,7 @@ To speed-up computations, provide `n`, the number of alternatives.
 - `cf`: a choice function.
 - `n` the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
-function strictUCR(cf::ChoiceFunction{Int}; n::Int = 0)
+function strictUCR(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
     if n == 0
         n = setoflaternatives(cf)
     elseif n < 0
@@ -328,4 +328,74 @@ function strictUCR(cf::ChoiceFunction{Int}; n::Int = 0)
         end
     end
     return result
+end
+
+"""
+```fixedpoint(cc::ChoiceCorrespondence{T}, S::Vector{T}) where T <: Int```
+
+Find the fixed points of a choice correspondence `cc` in a set `S`, according to the definition of Aleskerov et al (2007).
+
+# Arguments
+
+- `cc`, the choice correspondence;
+- `S`, the set considered.
+"""
+function fixedpoint(cc::ChoiceCorrespondence{T}, S::Vector{T}) where T <: Int
+    result = Vector{T}()
+    for x in S
+        bestx = true
+        if in(x, cc[S]) 
+            for (U, cU) in cc
+                if issubset(U, S) & !(U == S) & in(x, U) & !in(x, cU)
+                    bestx = false
+                end
+            end
+            if bestx 
+                push!(result, x)
+            end
+        end
+    end
+    return result
+end
+
+"""
+```fixedpointpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int```
+
+Return the preferences revealed with the Fixed Point axio of Aleskerov et al (2007).
+
+# Arguments
+
+- `cc`, the choice correspondence;
+- ``n, the number of alternatives considered.
+"""
+function fixedpointpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
+    if n == 0
+        n = setoflaternatives(cc)
+    elseif n < 0
+        DomainError(n, "should be positive.")
+    end    
+    dg = DiGraph(n)
+    g = Graph(n)
+    S = collect(1:n)
+    FP = Vector{T}()
+    while (length(S) >=2)
+        bestS = fixedpoint(cc, S)
+        if issubset(bestS, FP)
+            return dg, g
+        else
+            FP = union(FP, bestS)
+        end
+        for x in bestS
+            setdiff!(S, FP)
+            for t in S
+                add_edge!(dg, x, t)
+            end
+            for t in bestS
+                if !(t == x) 
+                    add_edge!(g, x, t)
+                end
+            end
+        end
+    end
+    return dg, g
 end
