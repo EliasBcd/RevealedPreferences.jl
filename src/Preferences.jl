@@ -63,7 +63,7 @@ Look at the number of alternatives in a choice function. It might be slow if the
 function setoflaternatives(cf::ChoiceFunction{T}) where T <: Int
     set = Set{T}()
     for key in keys(cf)
-        push!(set, key)
+        union!(set, key)
     end
     return length(set)
 end
