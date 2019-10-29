@@ -5,7 +5,7 @@ Return whether a choice correspondence verify the Weak Axiom of Revealed Prefere
 
 # Arguments
 
-- `cc`: the choice correspondence to be tested.
+- `cc`, the choice correspondence to be tested.
 """
 function isWARP(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
@@ -77,7 +77,7 @@ Check whether a choice correspondence violate the ALPHA axiom (aka H, the Heredi
 
 # Arguments
 
-- `cc`: the choice correspondence to be tested.
+- `cc`, the choice correspondence to be tested.
 """
 function isalpha(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
@@ -101,7 +101,7 @@ Check whether a choice correspondence violate the BETA axiom.
 
 # Arguments
 
-- `cc`: the choice correspondence to be tested.
+- `cc`, the choice correspondence to be tested.
 """
 function isbeta(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
@@ -128,7 +128,7 @@ Check whether a choice correspondence violate the DELTA axiom.
 
 # Arguments
 
-- `cc`: the choice correspondence to be tested.
+- `cc`, the choice correspondence to be tested.
 """
 function isdelta(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
@@ -156,7 +156,7 @@ Check whether a choice correspondence violate the Gamma axiom of Sen (1997)
 
 # Arguments
 
-- `cc`: the choice correspondence to be tested.
+- `cc`, the choice correspondence to be tested.
 """
 function isgamma(cc::ChoiceCorrespondence{T}) where T <: Int
     Ss = collect(keys(cc))
@@ -178,7 +178,7 @@ Check whether WARNI is verified by a choice correspondence.
 
 # Arguments
 
-- `cc`: the choice correspondence to be tested.
+- `cc`, the choice correspondence to be tested.
 """
 function isWARNI(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
@@ -209,7 +209,7 @@ Check whether the Outcast axiom is verified by a choice correspondence.
 
 # Arguments
 
-- `cc`: the choice correspondence to be tested.
+- `cc`, the choice correspondence to be tested.
 """
 function isoutcast(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
@@ -231,7 +231,7 @@ Verify the Functional Asymmetry Axiom on a choice correspondence.
 
 # Arguments
 
-- `cc`: the choice correspondence to be tested.
+- `cc`, the choice correspondence to be tested.
 """
 function isFAs(cc::ChoiceCorrespondence{T}) where T <: Int
     Ss = collect(keys(cc))
@@ -253,7 +253,7 @@ Is the Jamison Lau Fishburn condition verified?
 
 # Arguments
 
-- `cc`: the choice correspondence to be tested.
+- `cc`, the choice correspondence to be tested.
 """
 function isJLF(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
@@ -281,7 +281,7 @@ Test the occasional optimality condition of Mira Frick (2016).
 
 # Arguments
 
-- `cc`: the choice correspondence to be tested.
+- `cc`, the choice correspondence to be tested.
 """
 function isOO(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
@@ -329,7 +329,7 @@ Test the fixed point axiom of Aleskerov, Buyssou and Monjardet (2007).
 
 # Arguments
 
-- `cc`: the choice correspondence to be tested.
+- `cc`, the choice correspondence to be tested.
 """
 function isFP(cc::ChoiceCorrespondence{T}) where T <: Int
     Ss = collect(keys(cc))
@@ -361,24 +361,24 @@ function isFP(cc::ChoiceCorrespondence{T}) where T <: Int
 end
 
 """
-```isFA(cc::ChoiceCorrespondence{T}, ndg::Int = 0) where T <: Int```
+```isFA(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int```
 
 Test the functional acyclicity axiom of Aleskerov, Buyssou and Monjardet (2007).
 
 # Arguments
 
-- `cc`: the choice correspondence to be tested.
-- `ndg`: Size of the digraph, if not given, will look in the choice correspondence for the length.
+- `cc`, the choice correspondence to be tested;
+- `n`, size of the digraph, if not given, will look in the choice correspondence for the length.
 """
-function isFA(cc::ChoiceCorrespondence{T}, ndg::Int = 0) where T <: Int
-    if ndg == 0
+function isFA(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
+    if n == 0
         set = Set{Int}()
         for (S, cS) in cc
             for x in S
                 push!(set, x)
             end
         end
-        ndg = length(set)       
+        n = length(set)       
     end
     dg = DiGraph(ndg)
     for (S, cS) in cc

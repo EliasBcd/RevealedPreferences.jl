@@ -4,13 +4,13 @@
 Look for all the maximal elements of the DiGraph `dg` in `set`.
 Return the number of alternatives that are admissible.
 
-# Arguments:
+# Arguments
 
-- `dg`: A DiGraph.
-- `set`: A set of the same type than the DiGraph.
+- `dg`, a DiGraph;
+- `set`, a set of the same type than the DiGraph.
 """
 function optimalset(dg::DiGraph{T}, set::Vector{T}) where {T<:Int}
-    pss = 0
+    result = 0
     for t in set
         copyset = copy(set)
         s = pop!(copyset)
@@ -18,8 +18,8 @@ function optimalset(dg::DiGraph{T}, set::Vector{T}) where {T<:Int}
             s = pop!(copyset)
         end
         if isempty(copyset) && !has_edge(dg, s, t)
-            pss += 1
+            result += 1
         end
     end
-    return pss
+    return result
 end

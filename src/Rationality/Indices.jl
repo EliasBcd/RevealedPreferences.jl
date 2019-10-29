@@ -5,7 +5,7 @@ Compute the swap index of Apesteguia and Ballester (2016) for the digraph `digra
 
 # Arguments
 
-- `wdg`: the preference graph and its associated weights.
+- `wdg`, the preference graph and its associated weights.
 """
 function swapindex(wdg::WeightedDiGraph)
     if !is_cyclic(digraph(wdg))
@@ -77,8 +77,8 @@ Compute all choice sets of size larger than `floor` for a given number of altern
 
 # Arguments
 
-- `n`: the number of alternatives. 
-- `floor`: minimal size of the choice sets. Default to 2.
+- `n`, the number of alternatives;
+- `floor`, minimal size of the choice sets. Default to 2.
 """
 function allchoicesets(n::Int, floor::Int = 2)
     if floor < 0
@@ -101,7 +101,7 @@ Compute all possible combination of choice sets to remove.
 
 # Arguments
 
-- `n`: the number of alternatives in the grand set of alternatives.
+- `n`, the number of alternatives in the grand set of alternatives.
 """
 function allcombinationchoicesets(n::Int)
     rs = Vector{Vector{Int}}()
@@ -120,10 +120,10 @@ end
 
 Return the number of cycles of each length.
 
-# Arguments:
+# Arguments
 
-- `dg`: the preference relation
-- `pref`: the name of the preference relation, defaults to "RP".
+- `dg`, the preference relation;
+- `pref`, the name of the preference relation, defaults to "RP".
 """
 function cyclesbylength(dg::DiGraph; pref::AbstractString = "RP")
     cyclelength = simplecycleslength(dg)
@@ -140,7 +140,8 @@ Use a brute force algorithm to do so.
 
 # Arguments:
 
-- `cf`: The choice function that is used to computed the Houtman-Maks index.
+- `cf`, the choice function that is used to computed the Houtman-Maks index;
+- `removablesets`, the set of all possible combination of sets that can be removed.
 """
 function HMI(cf::ChoiceFunction{T}, removablesets::Vector{Vector{Vector{T}}}) where T <: Int
     rp = RP(cf)

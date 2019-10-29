@@ -76,7 +76,7 @@ Create the revealed preferences from an observed choice function, assuming that 
 # Arguments
 
 - `cf`, a choice function.
-- `n` the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
+- `n`, the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
 function revealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
     if n == 0
@@ -103,7 +103,7 @@ Create the revealed preferences from an observed choice function. It assumes tha
 # Arguments
 
 - `cf`, a choice function.
-- `n` the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
+- `n`, the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
 function weakstrictrevealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
     if n == 0
@@ -136,7 +136,7 @@ Create the revealed preferences from an observed choice function. It assumes tha
 # Arguments
 
 - `cf`, a choice function.
-- `n` the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
+- `n`, the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
 function weakstrictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
     if n == 0
@@ -173,7 +173,7 @@ Create the strict revealed preferences from an observed choice correspondence.
 # Arguments
 
 - `cc`, a choice function.
-- `n` the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
+- `n`, the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
 function strictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
     if n == 0
@@ -200,7 +200,7 @@ Create the revealed indifferences from an observed choice correspondence.
 # Arguments
 
 - `cc`, a choice function.
-- `n` the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
+- `n`, the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
 function indifferentrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
     if n == 0
@@ -227,7 +227,7 @@ Create the revealed preferences from an observed choice correspondence, includin
 # Arguments
 
 - `cc`, a choice correspondence.
-- `n` the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
+- `n`, the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
 function revealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
     if n == 0
@@ -248,7 +248,7 @@ Create the revealed preferences from an observed choice function, weighting each
 # Arguments
 
 - `cf`, a choice function.
-- `n` the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
+- `n`, the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
 function revealedpreferencesweighted(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
     if n == 0
@@ -270,23 +270,44 @@ function revealedpreferencesweighted(cf::ChoiceFunction{T}, n::Int = 0) where T 
 end
 
 """
-```transitivecore(dg::DiGraph,  n::Int = 0)```
+```strictrevealedpreferences(price::Matrix{T}, quantity::Matrix{T}) where T <: Number```
+
+Create the strict revealed preferences from observed prices and quantities. Assumes that each period is a row, and that the prices and goods are in the same place for the same period in the matrices.
+
+# Arguments
+
+- `price`, the observed prices;
+- `quantity`, the observed quantities purchased at the given prices;
+- `aei`, a coefficient to loosen or tighten the budget constraint. Used to compute the Afriat Efficiency Index. When equal to 1 (the default), it is traditional revealed preferences.
+"""
+function strictrevealedpreferences(price::Matrix{T}, quantity::Matrix{T}, aei::Number = 1) where T <: Number
+    l = size(price, 1)
+    result = DiGraph(l)
+    expenditures = price .* quantity
+    budget = sum(price .* quantity, dims = 2)
+    normalizedprice = price ./ budget
+    for i in 1:l
+        for j in  findall(quantity * normalizedprice[i, :] .- aei .<= eps(1.)) # To take into account rounding errors in the computations.
+            if i != j
+                add_edge!(result, i, j)
+            end
+        end
+    end
+    return result
+end
+
+"""
+```transitivecore(dg::DiGraph)```
 
 Compute the transitive core of a directed graph.
 To speed-up computations, provide `n`, the number of alternatives.
 
 # Arguments
 
-- `dg` a digraph from which we will build the transitive core.
-- `n` the number of alternatives. If no value is provided, use the size of the original graph.
+- `dg`, a digraph from which we will build the transitive core.
 """
-function transitivecore(dg::DiGraph, n::Int = 0)
-    if n == 0
-        n = nv(dg)
-    elseif n < 0
-        DomainError(n, "should be positive.")
-    end
-    tc = DiGraph(n)
+function transitivecore(dg::DiGraph)
+    tc = DiGraph(nv(dg))
     for e in edges(dg)
         (s,t) = (src(e), dst(e))
         if (issubset(outneighbors(dg, t), outneighbors(dg, s)) && issubset(inneighbors(dg, s), inneighbors(dg, t)))
@@ -304,8 +325,8 @@ To speed-up computations, provide `n`, the number of alternatives.
 
 # Arguments
 
-- `cf`: a choice function.
-- `n` the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
+- `cf`, a choice function.
+- `n`, the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
 function strictUCR(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
     if n == 0
@@ -317,8 +338,9 @@ function strictUCR(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
     forbidden = Set{Tuple{Int, Int}}()
     for (key, value) in cf
         for i in key
-            i == value && continue
-            if has_edge(result, i, value)
+            if i == value
+                continue
+            elseif has_edge(result, i, value)
                 rem_edge!(result, i, value) 
                 push!(forbidden, (i, value))
                 push!(forbidden, (value, i))
@@ -328,6 +350,25 @@ function strictUCR(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
         end
     end
     return result
+end
+
+"""
+```strictUCR(dg::DiGraph)```
+
+Create the Strict UCR graph from an observed strict revealed preference.
+
+# Arguments
+
+- `dg`, a digraph from which we will build the strict unambiguous choice relation. This digraph should be the revealed preferences relation.
+"""
+function strictUCR(dg::DiGraph)
+    res = DiGraph(nv(dg))
+    for e in edges(dg)
+        if !has_edge(dg, reverse(e))
+            add_edge!(res, e)
+        end
+    end
+    return res
 end
 
 """
@@ -366,7 +407,7 @@ Return the preferences revealed with the Fixed Point axio of Aleskerov et al (20
 # Arguments
 
 - `cc`, the choice correspondence;
-- ``n, the number of alternatives considered.
+- `n`, the number of alternatives considered.
 """
 function fixedpointpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
     if n == 0
