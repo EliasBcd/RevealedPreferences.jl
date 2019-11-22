@@ -60,7 +60,7 @@ Look at the number of alternatives in a choice function. It might be slow if the
 
 - `cf`, a choice function.
 """
-function setoflaternatives(cf::ChoiceFunction{T}) where T <: Int
+function setoflaternatives(cf::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}) where T <: Int
     set = Set{T}()
     for key in keys(cf)
         union!(set, key)
@@ -346,6 +346,41 @@ function strictUCR(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
                 push!(forbidden, (value, i))
             elseif !in((value, i), forbidden)                
                 add_edge!(result, value, i)
+            end
+        end
+    end
+    return result
+end
+
+"""
+```strictUCR(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int```
+
+Create the Strict UCR graph from an observed choice correspondence.
+To speed-up computations, provide `n`, the number of alternatives.
+
+# Arguments
+
+- `cc`, a choice correspondence.
+- `n`, the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
+"""
+function strictUCR(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
+    if n == 0
+        n = setoflaternatives(cc)
+    elseif n < 0
+        DomainError(n, "should be positive.")
+    end    
+    result = DiGraph(n)
+    forbidden = Set{Tuple{Int, Int}}()
+    for (key, value) in cc
+        for k in key, v in value
+            if k == v
+                continue
+            elseif has_edge(result, k, v)
+                rem_edge!(result, k, v) 
+                push!(forbidden, (k, v))
+                push!(forbidden, (v, k))
+            elseif !in((v, k), forbidden)                
+                add_edge!(result, v, k)
             end
         end
     end
