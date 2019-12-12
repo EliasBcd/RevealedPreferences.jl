@@ -23,3 +23,38 @@ function optimalset(dg::DiGraph{T}, set::Vector{T}) where {T<:Int}
     end
     return result
 end
+
+
+"""
+```Selten(dg::DiGraph{T}, set::Vector{T}) where T<:Int```
+
+Compute the Selten's score of a given digraph on a given set.
+
+# Arguments
+
+- `dg`, a DiGraph;
+- `set`, a set of the same type than the DiGraph.
+"""
+function Selten(dg::DiGraph{T}, set::Vector{T}) where T<:Int
+    return 1 - length(optimalset(dg, set)) / length(set)
+end
+
+
+"""
+```Selten(dg::DiGraph{T}, sets::Vector{Vector{T}}, f = mean) where T<:Int```
+
+Aggregate Selten's score of a given digraph for a list of sets, according to function f.
+
+# Arguments
+
+- `dg`, a DiGraph;
+- `set`, a vector of sets of the same type than the DiGraph;
+- `f`, a function to use for aggregation, default the mean.
+"""
+function Selten(dg::DiGraph{T}, sets::Vector{Vector{T}}, f = mean) where T<:Int
+    res = Vector{Float64}()
+    for set in sets
+        push!(res, Selten(dg, set))
+    end
+    return f(res)
+end
