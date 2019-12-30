@@ -6,6 +6,7 @@ using DataFrames: DataFrame
 
 import GLPK
 import StatsBase.mean
+import StatsBase.countmap
 
 export ChoiceFunction, ChoiceCorrespondence, WeightedDiGraph, weights, digraph, setoflaternatives, overlap, revealedpreferences, strictrevealedpreferences, indifferencerevealedpreferences, revealedpreferencesweighted, weakstrictrevealedpreferences, transitivecore, strictUCR,  allchoicesets, allcombinationchoicesets, cyclesbylength, HMI, swapindex, optimalset, isWARP, isWARNI, isoutcast, isFAs, isFP, isOO, isalpha, isbeta, isgamma, isdelta, isJLF, isFA, isacyclic, fixedpointpreferences, Selten, edgedegree, cyclieswosubcycles!, numbercycleswosubcycles!
 
