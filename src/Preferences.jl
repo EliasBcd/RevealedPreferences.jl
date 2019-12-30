@@ -69,6 +69,35 @@ function setoflaternatives(cf::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}
 end
 
 """
+```overlap(sets::Vector{Vector{T}}) where T <: Number```
+
+Compute the matrix of vector overlap, filling the whole matrix, so that the information is in double.
+
+# Arguments
+
+- `sets`, a vector of vectors, over which we wish to compute the overlap.
+"""
+function overlap(sets::Vector{Vector{T}}) where T <: Number
+    l = length(sets)
+    if l == 0
+        return zeros(Float64, 0, 0)
+    elseif l == 1
+        return ones(Float64, 1, 1)
+    end
+    res = zeros(Float64, l, l)
+    for i in 1:l, j in  (i+1):l
+        res[i, j] = length(intersect(sets[i], sets[j])) / length(union(sets[i], sets[j]))
+    end
+    for i in 1:l
+        res[i, i] = 1.
+    end
+    for i in 1:length(sets), j in 1:(i-1)
+        res[i, j] = res[j, i]
+    end
+    return res
+end
+
+"""
 ```revealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int```
 
 Create the revealed preferences from an observed choice function, assuming that the preferences revealed are strict.
