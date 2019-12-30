@@ -44,7 +44,7 @@ function numbercycleswosubcycles!(dg::DiGraph{T}, name::AbstractString = "RP") w
     res = DataFrame()
     if !isempty(cycleslength)
         for (k, v)  in countmap(cycleslength)
-            res[!, Symbol("$(name)$(k)NOSC")] = [v]
+            res[!, Symbol("$(name)NOSC$(k)")] = [v]
         end
     end
     return res
