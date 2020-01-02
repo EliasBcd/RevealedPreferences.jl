@@ -1,3 +1,25 @@
+"""
+```removeallcycles!(dg::DiGraph{T}) where T <: Int```
+
+Remove all the cycles from the digraph `dg`.
+Modify the digraph in place.
+
+# Arguments
+
+- `dg`, a digraph.
+"""
+function removeallcycles!(dg::DiGraph{T}) where T <: Int
+    sccs = strongly_connected_components(dg)
+    for scc in sccs
+        if length(scc) > 1
+            sdg, vmap = induced_subgraph(dg, scc)
+            for e in edges(sdg)
+                rem_edge!(dg, vmap[src(e)], vmap[dst(e)])
+            end
+        end
+    end
+    return dg
+end
 
 """
 ```cycleswosubcycles!(dg::DiGraph{T}) where T <: Int```
