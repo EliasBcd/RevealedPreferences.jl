@@ -26,24 +26,31 @@ end
 
 
 """
-```Selten(dg::DiGraph{T}, set::Vector{T}) where T<:Int```
+```Selten(cc::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}, dg::DiGraph{T}, cset::Vector{T}, pset::Vector{T}) where T<:Int```
 
-Compute the Selten's score of a given digraph on a given set.
+Compute the Selten's score of a given digraph and a given choice correspondence on a given set.
 
 # Arguments
 
-- `dg`, a DiGraph;
-- `set`, a set of the same type than the DiGraph.
+- `cc`, a ChoiceFunction or a ChoiceCorrespondence;
+- `dg`, a DiGraph, normally derived from `cc`;
+- `set`, the set on which we are looking for predictions.
 """
-function Selten(dg::DiGraph{T}, set::Vector{T}) where T<:Int
-    return 1 - length(optimalset(dg, set)) / length(set)
+function Selten(cc::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}, dg::DiGraph{T}, set::Vector{T}) where T<:Int
+    if typeof(cc) <: ChoiceFunction
+        return in(cc[set], set) - length(optimalset(dg, set)) / length(set)
+    else
+        return issubset(cc, set) - length(optimalset(dg, set)) / length(set)
+    end
 end
 
 
-"""
-```Selten(dg::DiGraph{T}, sets::Vector{Vector{T}}, f = mean) where T<:Int```
 
-Aggregate Selten's score of a given digraph for a list of sets, according to function f.
+
+"""
+```Selten(cc::Union{ChoiceCorrespondence{T}, ChoiceFunction{T}}, dg::DiGraph{T}, sets::Vector{Vector{T}}, f = mean) where T<:Int```
+
+Aggregate Selten's score of a given digraph on a given ChoiceFunction or ChoiceCorrespondence for a list of sets, according to function f.
 
 # Arguments
 
@@ -51,10 +58,10 @@ Aggregate Selten's score of a given digraph for a list of sets, according to fun
 - `set`, a vector of sets of the same type than the DiGraph;
 - `f`, a function to use for aggregation, default the mean.
 """
-function Selten(dg::DiGraph{T}, sets::Vector{Vector{T}}, f = mean) where T<:Int
+function Selten(cc::Union{ChoiceCorrespondence{T}, ChoiceFunction{T}}, dg::DiGraph{T}, sets::Vector{Vector{T}}, f = mean) where T <: Int
     res = Vector{Float64}()
     for set in sets
-        push!(res, Selten(dg, set))
+        push!(res, Selten(cc, dg, set))
     end
     return f(res)
 end
