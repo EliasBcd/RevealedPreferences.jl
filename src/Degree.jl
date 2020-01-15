@@ -43,7 +43,11 @@ function edgesdegree(dg::Union{Graph{T}, DiGraph{T}}, elist::Vector{Edge{T}}, f1
     for e in elist
         push!(res, edgedegree(dg, e, f1, f2))
     end
-    return f3(res)
+    if isempty(res)
+        return 0
+    else
+        return f3(res)
+    end
 end
 
 """
