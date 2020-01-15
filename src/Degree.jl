@@ -15,12 +15,18 @@ function edgedegree(dg::Union{Graph{T}, DiGraph{T}}, e::Edge{T}, f1, f2) where T
     res = Vector{Float64}()
     for x in [src(e), dst(e)]
         if f1 == /
-            push!(res, f1(outdegree(dg, x), degree(dg, x)))
+            if degree(dg, x) > 0
+                push!(res, f1(outdegree(dg, x), degree(dg, x)))
+            end
         else
             push!(res, f1(outdegree(dg, x), indegree(dg, x)))
         end
     end
-    return f2(res)
+    if isempty(res)
+        return 0
+    else
+        return f2(res)
+    end
 end
 
 """
