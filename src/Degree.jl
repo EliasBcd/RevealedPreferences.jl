@@ -57,7 +57,7 @@ function edgesdegree(dg::Union{Graph{T}, DiGraph{T}}, elist::Vector{Edge{T}}, f1
 end
 
 """
-```missingedgesdegree(dg::Union{Graph{T}, DiGraph{T}},f1 = -, f2 = mean, f3 = mean) where T <: Int```
+```missingedgesdegree(dg::Union{Graph{T}, DiGraph{T}},f1 = -, f2 = mean, f3 = mean; refdg::DiGraph = dg) where T <: Int```
 
 Aggregate the relation between indegree and outdegree of missing edges compared to a complete graph of the same size.
 Compute the relation between in degree and out degree for a given vertice using function `f1`.
@@ -70,10 +70,11 @@ Aggregaste over all edges using function `f3.`
 - `f1`, the function used within a vertex;
 - `f2`, the function used within an edge;
 - `f3`, the function used to aggregate between edges;
+- `refdg` is the digraph on which the degree indices should be computed. Default to the digraph we are interested in.
 """
-function missingedgesdegree(dg::Union{Graph{T}, DiGraph{T}},f1 = -, f2 = mean, f3 = mean) where T <: Int
+function missingedgesdegree(dg::Union{Graph{T}, DiGraph{T}},f1 = -, f2 = mean, f3 = mean; refdg::DiGraph = dg) where T <: Int
     g = Graph(dg)
     cg = complete_graph(nv(g))
     diffg = difference(cg, g)
-    return edgesdegree(dg, collect(edges(diffg)), f1, f2, f3)
+    return edgesdegree(refdg, collect(edges(diffg)), f1, f2, f3)
 end
