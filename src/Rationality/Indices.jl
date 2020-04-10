@@ -1,5 +1,5 @@
 """
-```swapindex(wdg::WeightedDiGraph)```
+    swapindex(wdg::WeightedDiGraph)
 
 Compute the swap index of Apesteguia and Ballester (2016) for the digraph `digraph(wdg)` where the frequency of each relation is given by the Matrix `weights(wdg)`.
 
@@ -71,7 +71,7 @@ function swapindex(wdg::WeightedDiGraph)
 end
 
 """
-```allchoicesets(n::Int, floor::Int = 2)```
+    allchoicesets(n::Int, floor::Int = 2)
 
 Compute all choice sets of size larger than `floor` for a given number of alternatives.
 
@@ -95,13 +95,9 @@ function allchoicesets(n::Int, floor::Int = 2)
 end
 
 """
-```allcombinationchoicesets(n::Int)```
+    allcombinationchoicesets(n::Int)
 
-Compute all possible combination of choice sets to remove.
-
-# Arguments
-
-- `n`, the number of alternatives in the grand set of alternatives.
+Compute all possible combination of choice sets to remove from a grand set of alternatives of size `n`.
 """
 function allcombinationchoicesets(n::Int)
     rs = Vector{Vector{Int}}()
@@ -116,9 +112,9 @@ function allcombinationchoicesets(n::Int)
 end
 
 """
-```cyclesbylength(dg::DiGraph; pref::AbstractString = "RP")```
+    cyclesbylength(dg::DiGraph; pref::AbstractString = "RP")
 
-Return the number of cycles of each length.
+Return the number of cycles of each length in a digraph `dg`.
 
 # Arguments
 
@@ -133,7 +129,7 @@ function cyclesbylength(dg::DiGraph; pref::AbstractString = "RP")
 end
 
 """
-```HMI(cf::ChoiceFunction{T}, removablesets::Vector{Vector{Vector{T}}}) where T <: Int```
+    HMI(cf::ChoiceFunction{T}, removablesets::Vector{Vector{Vector{T}}}) where T <: Int
 
 Compute the Houtman-Maks Index (1985) with brute force, conditional on providing the set of removable alternatives beforehand.
 Use a brute force algorithm to do so.

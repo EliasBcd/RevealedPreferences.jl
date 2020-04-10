@@ -1,11 +1,9 @@
 """
-```isWARP(cc::ChoiceCorrespondence{T})``` 
+    isWARP(cc::ChoiceCorrespondence{T})
 
-Return whether a choice correspondence verify the Weak Axiom of Revealed Preferences. This test is only valid if the choice correspondence is fully observed, that is, if it contains all possible subsets of alternatives.
+Return if the choice correspondence `cc` satisfies the Weak Axiom of Revealed Preferences. 
 
-# Arguments
-
-- `cc`, the choice correspondence to be tested.
+This test is only valid if the choice correspondence is fully observed, that is, if it contains all possible subsets of alternatives.
 """
 function isWARP(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
@@ -23,9 +21,9 @@ function isWARP(cc::ChoiceCorrespondence{T}) where T <: Int
 end
 
 """
-```isacyclic(dg::DiGraph{T}, g::Graph{T}) where T <: Int```
+    isacyclic(dg::DiGraph{T}, g::Graph{T}) where T <: Int
 
-Check whether a preference relation is acyclic. 
+Check whether a preference relation represented in a digraph `dg` and a graph `g` is acyclic. 
 
 # Arguments
 
@@ -54,9 +52,9 @@ end
 
 
 """
-```isacyclic(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int```
+    isacyclic(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
 
-Return whether a choice function is acyclic, by computing first its weak and strict revealed preferences.
+Check if a choice function `cf` is acyclic when using revealed preferences.
 
 # Arguments
 
@@ -71,13 +69,11 @@ end
 
 
 """
-```isalpha(cc::ChoiceCorrespondence{T}) where T <: Int```
+    isalpha(cc::ChoiceCorrespondence{T}) where T <: Int
 
-Check whether a choice correspondence violate the ALPHA axiom (aka H, the Heredity Axiom).
+Check whether a choice correspondence `cc` violate the ``\alpha`` axiom of Sen (1971).[^Sen1997]
 
-# Arguments
-
-- `cc`, the choice correspondence to be tested.
+[^Sen1997]: Sen, Amartya K. "Choice Functions and Revealed Preference." *The Review of Economic Studies*, vol. 38, no. 3, 1971, pp. 307–317. JSTOR, [www.jstor.org/stable/2296384](www.jstor.org/stable/2296384).
 """
 function isalpha(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
@@ -95,13 +91,11 @@ function isalpha(cc::ChoiceCorrespondence{T}) where T <: Int
 end
 
 """
-```isbeta(cc::ChoiceCorrespondence{T}) where T <: Int```
+    isbeta(cc::ChoiceCorrespondence{T}) where T <: Int
 
-Check whether a choice correspondence violate the BETA axiom.
+Check if a choice correspondence `cc` violates the ``\beta`` axiom of Sen (1971).[^Sen1997]
 
-# Arguments
-
-- `cc`, the choice correspondence to be tested.
+[^Sen1997]: Sen, Amartya K. "Choice Functions and Revealed Preference." *The Review of Economic Studies*, vol. 38, no. 3, 1971, pp. 307–317. JSTOR, [www.jstor.org/stable/2296384](www.jstor.org/stable/2296384).
 """
 function isbeta(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
@@ -122,13 +116,11 @@ function isbeta(cc::ChoiceCorrespondence{T}) where T <: Int
 end
 
 """
-```isdelta(cc::ChoiceCorrespondence{T}) where T <: Int```
+    isdelta(cc::ChoiceCorrespondence{T}) where T <: Int```
 
-Check whether a choice correspondence violate the DELTA axiom.
+Check if a choice correspondence `cc` violates the ``\delta`` axiom of Sen (1971).[^Sen1997]
 
-# Arguments
-
-- `cc`, the choice correspondence to be tested.
+[^Sen1997]: Sen, Amartya K. "Choice Functions and Revealed Preference." *The Review of Economic Studies*, vol. 38, no. 3, 1971, pp. 307–317. JSTOR, [www.jstor.org/stable/2296384](www.jstor.org/stable/2296384).
 """
 function isdelta(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
@@ -150,13 +142,11 @@ end
 
 
 """
-```isgamma(cc::ChoiceCorrespondence{T}) where T <: Int```
+    isgamma(cc::ChoiceCorrespondence{T}) where T <: Int
 
-Check whether a choice correspondence violate the Gamma axiom of Sen (1997)
+Check if a choice correspondence `cc` violates the ``\gamma`` axiom of Sen (1971).[^Sen1997]
 
-# Arguments
-
-- `cc`, the choice correspondence to be tested.
+[^Sen1997]: Sen, Amartya K. "Choice Functions and Revealed Preference." *The Review of Economic Studies*, vol. 38, no. 3, 1971, pp. 307–317. JSTOR, [www.jstor.org/stable/2296384](www.jstor.org/stable/2296384).
 """
 function isgamma(cc::ChoiceCorrespondence{T}) where T <: Int
     Ss = collect(keys(cc))
@@ -172,13 +162,18 @@ function isgamma(cc::ChoiceCorrespondence{T}) where T <: Int
 end
 
 """
-```isWARNI(cc::ChoiceCorrespondence{T}) where T <: Int```
+    isWARNI(cc::ChoiceCorrespondence{T}) where T <: Int
 
-Check whether WARNI is verified by a choice correspondence.
+Check if a choice correspondence `cc` satisfies WARNI of Eliaz and Ok (2006).[^Eliaz2006]
 
-# Arguments
-
-- `cc`, the choice correspondence to be tested.
+[^Eliaz2006]: Kfir Eliaz, Efe A. Ok,
+"Indifference or indecisiveness? Choice-theoretic foundations of incomplete preferences,"
+*Games and Economic Behavior*,
+Volume 56, Issue 1,
+2006,
+Pages 61-86,
+ISSN 0899-8256,
+[https://doi.org/10.1016/j.geb.2005.06.007.](https://doi.org/10.1016/j.geb.2005.06.007.)
 """
 function isWARNI(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
@@ -203,13 +198,11 @@ function isWARNI(cc::ChoiceCorrespondence{T}) where T <: Int
 end
 
 """
-```isoutcast(cc::ChoiceCorrespondence{T}) where T <: Int```
+    isoutcast(cc::ChoiceCorrespondence{T}) where T <: Int
 
-Check whether the Outcast axiom is verified by a choice correspondence.
+Check if a choice correspondence `cc` satisfies the Outcast axiom from Aleskerov, Bouyssou and Monjarder (2007).[^ABM2007]
 
-# Arguments
-
-- `cc`, the choice correspondence to be tested.
+[^ABM2007]: ALESKEROV, Fuad, BOUYSSOU, Denis, et MONJARDET, Bernard. *Utility maximization, choice and preference.* Springer Science & Business Media, 2007.
 """
 function isoutcast(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
@@ -225,13 +218,11 @@ function isoutcast(cc::ChoiceCorrespondence{T}) where T <: Int
 end
 
 """
-```isFAs(cc::ChoiceCorrespondence{T}) where T <: Int```
+    isFAs(cc::ChoiceCorrespondence{T}) where T <: Int
 
-Verify the Functional Asymmetry Axiom on a choice correspondence.
+Check if the choice correspondence `cc` satisfies the Functional Asymmetry axiom from Aleskerov, Bouyssou and Monjarder (2007).[^ABM2007]
 
-# Arguments
-
-- `cc`, the choice correspondence to be tested.
+[^ABM2007]: ALESKEROV, Fuad, BOUYSSOU, Denis, et MONJARDET, Bernard. *Utility maximization, choice and preference.* Springer Science & Business Media, 2007.
 """
 function isFAs(cc::ChoiceCorrespondence{T}) where T <: Int
     Ss = collect(keys(cc))
@@ -247,13 +238,11 @@ function isFAs(cc::ChoiceCorrespondence{T}) where T <: Int
 end
 
 """
-```isJLF(cc::ChoiceCorrespondence{T}) where T <: Int```
+    isJLF(cc::ChoiceCorrespondence{T}) where T <: Int
 
-Is the Jamison Lau Fishburn condition verified?
+Check if the choice correspondence `cc` satisfies the Jamison Lau Fishburn from Aleskerov, Bouyssou and Monjarder (2007).[^ABM2007]
 
-# Arguments
-
-- `cc`, the choice correspondence to be tested.
+[^ABM2007]: ALESKEROV, Fuad, BOUYSSOU, Denis, et MONJARDET, Bernard. *Utility maximization, choice and preference.* Springer Science & Business Media, 2007.
 """
 function isJLF(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
@@ -275,13 +264,9 @@ end
 
 
 """
-```isOO(cc::ChoiceCorrespondence{T}) where T <: Int```
+    isOO(cc::ChoiceCorrespondence{T}) where T <: Int
 
-Test the occasional optimality condition of Mira Frick (2016).
-
-# Arguments
-
-- `cc`, the choice correspondence to be tested.
+Test the occasional optimality condition of Mira Frick (2016) on the choice correspondence `cc`.
 """
 function isOO(cc::ChoiceCorrespondence{T}) where T <: Int
     for (S, cS) in cc
@@ -323,13 +308,11 @@ end
 
 
 """
-```isFP(cc::ChoiceCorrespondence{T}) where T <: Int```
+    isFP(cc::ChoiceCorrespondence{T}) where T <: Int
 
-Test the fixed point axiom of Aleskerov, Buyssou and Monjardet (2007).
+Check if the choice correspondence `cc` satisfies the Fixed Point axiom from Aleskerov, Bouyssou and Monjarder (2007).[^ABM2007]
 
-# Arguments
-
-- `cc`, the choice correspondence to be tested.
+[^ABM2007]: ALESKEROV, Fuad, BOUYSSOU, Denis, et MONJARDET, Bernard. *Utility maximization, choice and preference.* Springer Science & Business Media, 2007.
 """
 function isFP(cc::ChoiceCorrespondence{T}) where T <: Int
     Ss = collect(keys(cc))
@@ -361,10 +344,11 @@ function isFP(cc::ChoiceCorrespondence{T}) where T <: Int
 end
 
 """
-```isFA(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int```
+    isFA(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
 
-Test the functional acyclicity axiom of Aleskerov, Buyssou and Monjardet (2007).
+Check if the choice correspondence `cc` satisfies the Functional Acyclicity axiom from Aleskerov, Bouyssou and Monjarder (2007).[^ABM2007]
 
+[^ABM2007]: ALESKEROV, Fuad, BOUYSSOU, Denis, et MONJARDET, Bernard. *Utility maximization, choice and preference.* Springer Science & Business Media, 2007.
 # Arguments
 
 - `cc`, the choice correspondence to be tested;

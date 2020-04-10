@@ -1,32 +1,31 @@
 ## Definition of type aliases, to avoir writing Dict of Vector.
 
 """
-```ChoiceFunction{T}```
+    ChoiceFunction{T}
 
-Wrapper to define a choice function.
+Alias to define a choice function.
 """
-ChoiceFunction{T} = Dict{Vector{T}, T} where T <:Int
-
-"""
-```ChoiceCorrespondence{T}```
-
-Wrapper to define a choice correspondence.
-"""
-ChoiceCorrespondence{T} = Dict{Vector{T}, Vector{T}} where T <:Int
+ChoiceFunction{T} = Dict{Vector{T}, T} where T <: Int
 
 """
-```WeightedDiGraph{T<:Int}```
+    ChoiceCorrespondence{T}
+
+Alias to define a choice correspondence.
+"""
+ChoiceCorrespondence{T} = Dict{Vector{T}, Vector{T}} where T <: Int
+
+"""
+    WeightedDiGraph{T<:Int} where T <: Int
 
 Composite types to store all the informations about a DiGraph with weights.
-More adapted to my purpose than the WeightGraphs available in LightGraphs.
 """
-mutable struct WeightedDiGraph{T<:Int}
+mutable struct WeightedDiGraph{T} where T <: Int
     dg::DiGraph{T}
     weights::Matrix{Float64}
 end
 
 """
-```WeightedDiGraph(n::T) where T <: Int```
+    WeightedDiGraph(n::T) where T <: Int
 
 Constructor of an empty WeightedDiGraph of size `n`.
 """
@@ -37,28 +36,26 @@ function WeightedDiGraph(n::T) where T <: Int
 end
 
 """
-```weights(wdg::WeightedDiGraph)```
+    weights(wdg::WeightedDiGraph)
 
 Return the weights of a given `wdg`.
 """
-weights(wdg::WeightedDiGraph) = wdg.weights
+function weights(wdg::WeightedDiGraph) = wdg.weights end
 
 
 """
-```digraph(wdg::WeightedDiGraph)```
+    digraph(wdg::WeightedDiGraph)
 
 Return the digraph of a given `wdg`.
 """
 digraph(wdg::WeightedDiGraph) = wdg.dg
 
 """
-```setoflaternatives(cf::ChoiceFunction{T}) where T <: Int```
+    setoflaternatives(cf::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}) where T <: Int
 
-Look at the number of alternatives in a choice function. It might be slow if the number of alternatives is large.
+Look at the number of alternatives in a choice function or correspondence `cf`.
 
-# Arguments
-
-- `cf`, a choice function.
+It might be slow if the number of alternatives is large.
 """
 function setoflaternatives(cf::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}) where T <: Int
     set = Set{T}()
@@ -69,9 +66,9 @@ function setoflaternatives(cf::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}
 end
 
 """
-```overlap(sets::Vector{Vector{T}}) where T <: Number```
+    overlap(sets::Vector{Vector{T}}) where T <: Number
 
-Compute the matrix of vector overlap, filling the whole matrix, so that the information is in double.
+Compute the matrix of vectors overlap, filling the whole matrix, so that the information is in double.
 
 # Arguments
 
@@ -98,9 +95,9 @@ function overlap(sets::Vector{Vector{T}}) where T <: Number
 end
 
 """
-```revealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int```
+    revealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
 
-Create the revealed preferences from an observed choice function, assuming that the preferences revealed are strict.
+Create the revealed preferences from an observed choice function `cf`, assuming that the preferences revealed are strict.
 
 # Arguments
 
@@ -125,9 +122,11 @@ function revealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
 end
 
 """
-```weakstrictrevealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int```
+    weakstrictrevealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
 
-Create the revealed preferences from an observed choice function. It assumes that if in the choice function, we have a set were x in chosen and y was available, and a set where y is chosen and x is available, then x and y are indifferent.
+Create the revealed preferences from an observed choice function `cf`. 
+
+It assumes that if in the choice function `cf`, we have a set were x in chosen and y was available, and a set where y is chosen and x is available, then x and y are indifferent.
 
 # Arguments
 
@@ -158,9 +157,11 @@ function weakstrictrevealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where 
 end
 
 """
-```weakstrictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int```
+    weakstrictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
 
-Create the revealed preferences from an observed choice function. It assumes that if in the choice correspondence, we have a set were x in chosen and y was available, and a set where y is chosen and x is available, then x and y are indifferent.
+Create the revealed preferences from an observed choice function `cf`.
+
+It assumes that if in the choice correspondence, we have a set were x in chosen and y was available, and a set where y is chosen and x is available, then x and y are indifferent.
 
 # Arguments
 
@@ -195,9 +196,9 @@ function weakstrictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) 
 end
 
 """
-```strictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int```
+    strictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
 
-Create the strict revealed preferences from an observed choice correspondence.
+Create the strict revealed preferences from an observed choice correspondence `cc`.
 
 # Arguments
 
@@ -222,9 +223,9 @@ function strictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) wher
 end
 
 """
-```strictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int```
+    strictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
 
-Create the revealed indifferences from an observed choice correspondence.
+Create the revealed indifferences from an observed choice correspondence `cc`.
 
 # Arguments
 
@@ -249,9 +250,9 @@ function indifferentrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0)
 end
 
 """
-```revealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int```
+    revealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
 
-Create the revealed preferences from an observed choice correspondence, including indifference and strict preferences.
+Create the revealed preferences from an observed choice correspondence `cc`, including indifference and strict preferences.
 
 # Arguments
 
@@ -270,9 +271,9 @@ function revealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <:
 end
 
 """
-```revealedpreferencesweighted(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int```
+    revealedpreferencesweighted(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
 
-Create the revealed preferences from an observed choice function, weighting each relation by its frequency.
+Create the revealed preferences from an observed choice function `cf`, weighting each relation by its frequency.
 
 # Arguments
 
@@ -299,9 +300,11 @@ function revealedpreferencesweighted(cf::ChoiceFunction{T}, n::Int = 0) where T 
 end
 
 """
-```strictrevealedpreferences(price::Matrix{T}, quantity::Matrix{T}) where T <: Number```
+    strictrevealedpreferences(price::Matrix{T}, quantity::Matrix{T}) where T <: Number
 
-Create the strict revealed preferences from observed prices and quantities. Assumes that each period is a row, and that the prices and goods are in the same place for the same period in the matrices.
+Create the strict revealed preferences from observed prices `price` and quantities `quantity`.
+
+Assumes that each period is a row, and that the prices and goods are in the same place for the same period in the matrices.
 
 # Arguments
 
@@ -326,16 +329,11 @@ function strictrevealedpreferences(price::Matrix{T}, quantity::Matrix{T}, aei::N
 end
 
 """
-```transitivecore(dg::DiGraph)```
+    transitivecore(dg::DiGraph{T}) where T <: Int
 
-Compute the transitive core of a directed graph.
-To speed-up computations, provide `n`, the number of alternatives.
-
-# Arguments
-
-- `dg`, a digraph from which we will build the transitive core.
+Compute the transitive core of a directed graph `dg`.
 """
-function transitivecore(dg::DiGraph)
+function transitivecore(dg::DiGraph{T}) where T <: Int
     tc = DiGraph(nv(dg))
     for e in edges(dg)
         (s,t) = (src(e), dst(e))
@@ -347,9 +345,10 @@ function transitivecore(dg::DiGraph)
 end
 
 """
-```strictUCR(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int```
+    strictUCR(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
 
-Create the Strict UCR graph from an observed choice function.
+Create the Strict UCR graph from an observed choice function `cf`.
+
 To speed-up computations, provide `n`, the number of alternatives.
 
 # Arguments
@@ -382,9 +381,10 @@ function strictUCR(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
 end
 
 """
-```strictUCR(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int```
+    strictUCR(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
 
-Create the Strict UCR graph from an observed choice correspondence.
+Create the Strict UCR graph from an observed choice correspondence `cc`.
+
 To speed-up computations, provide `n`, the number of alternatives.
 
 # Arguments
@@ -417,9 +417,11 @@ function strictUCR(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
 end
 
 """
-```strictUCR(dg::DiGraph)```
+    strictUCR(dg::DiGraph)
 
-Create the Strict UCR graph from an observed strict revealed preference.
+Create the Strict UCR graph from an observed digraph `dg`.
+
+To be correct, directed graph must be obtained from strict revealed preferences.
 
 # Arguments
 
@@ -436,7 +438,7 @@ function strictUCR(dg::DiGraph)
 end
 
 """
-```fixedpoint(cc::ChoiceCorrespondence{T}, S::Vector{T}) where T <: Int```
+    fixedpoint(cc::ChoiceCorrespondence{T}, S::Vector{T}) where T <: Int
 
 Find the fixed points of a choice correspondence `cc` in a set `S`, according to the definition of Aleskerov et al (2007).
 
@@ -464,9 +466,9 @@ function fixedpoint(cc::ChoiceCorrespondence{T}, S::Vector{T}) where T <: Int
 end
 
 """
-```fixedpointpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int```
+    fixedpointpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
 
-Return the preferences revealed with the Fixed Point axio of Aleskerov et al (2007).
+Return the preferences revealed with the Fixed Point axio of Aleskerov et al (2007), from a choice correspondence `cc`.
 
 # Arguments
 
