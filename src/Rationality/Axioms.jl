@@ -116,7 +116,7 @@ function isbeta(cc::ChoiceCorrespondence{T}) where T <: Int
 end
 
 """
-    isdelta(cc::ChoiceCorrespondence{T}) where T <: Int```
+    isdelta(cc::ChoiceCorrespondence{T}) where T <: Int
 
 Check if a choice correspondence `cc` violates the ``\delta`` axiom of Sen (1971).[^Sen1997]
 
