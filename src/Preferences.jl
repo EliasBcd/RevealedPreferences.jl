@@ -40,7 +40,7 @@ end
 
 Return the weights of a given `wdg`.
 """
-function weights(wdg::WeightedDiGraph) = wdg.weights end
+weights(wdg::WeightedDiGraph) = wdg.weights
 
 
 """
@@ -48,7 +48,7 @@ function weights(wdg::WeightedDiGraph) = wdg.weights end
 
 Return the digraph of a given `wdg`.
 """
-function digraph(wdg::WeightedDiGraph) = wdg.dg end
+digraph(wdg::WeightedDiGraph) = wdg.dg
 
 """
     setoflaternatives(cf::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}) where T <: Int
