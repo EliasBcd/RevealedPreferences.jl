@@ -71,7 +71,7 @@ end
 """
     isalpha(cc::ChoiceCorrespondence{T}) where T <: Int
 
-Check whether a choice correspondence `cc` violate the ``\alpha`` axiom of Sen (1971).[^Sen1997]
+Check whether a choice correspondence `cc` violate the ``\\alpha`` axiom of Sen (1971).[^Sen1997]
 
 [^Sen1997]: Sen, Amartya K. "Choice Functions and Revealed Preference." *The Review of Economic Studies*, vol. 38, no. 3, 1971, pp. 307–317. JSTOR, [www.jstor.org/stable/2296384](www.jstor.org/stable/2296384).
 """
@@ -93,7 +93,7 @@ end
 """
     isbeta(cc::ChoiceCorrespondence{T}) where T <: Int
 
-Check if a choice correspondence `cc` violates the ``\beta`` axiom of Sen (1971).[^Sen1997]
+Check if a choice correspondence `cc` violates the ``\\beta`` axiom of Sen (1971).[^Sen1997]
 
 [^Sen1997]: Sen, Amartya K. "Choice Functions and Revealed Preference." *The Review of Economic Studies*, vol. 38, no. 3, 1971, pp. 307–317. JSTOR, [www.jstor.org/stable/2296384](www.jstor.org/stable/2296384).
 """
@@ -118,7 +118,7 @@ end
 """
     isdelta(cc::ChoiceCorrespondence{T}) where T <: Int
 
-Check if a choice correspondence `cc` violates the ``\delta`` axiom of Sen (1971).[^Sen1997]
+Check if a choice correspondence `cc` violates the ``\\delta`` axiom of Sen (1971).[^Sen1997]
 
 [^Sen1997]: Sen, Amartya K. "Choice Functions and Revealed Preference." *The Review of Economic Studies*, vol. 38, no. 3, 1971, pp. 307–317. JSTOR, [www.jstor.org/stable/2296384](www.jstor.org/stable/2296384).
 """
@@ -144,7 +144,7 @@ end
 """
     isgamma(cc::ChoiceCorrespondence{T}) where T <: Int
 
-Check if a choice correspondence `cc` violates the ``\gamma`` axiom of Sen (1971).[^Sen1997]
+Check if a choice correspondence `cc` violates the ``\\gamma`` axiom of Sen (1971).[^Sen1997]
 
 [^Sen1997]: Sen, Amartya K. "Choice Functions and Revealed Preference." *The Review of Economic Studies*, vol. 38, no. 3, 1971, pp. 307–317. JSTOR, [www.jstor.org/stable/2296384](www.jstor.org/stable/2296384).
 """

@@ -18,6 +18,8 @@ ChoiceCorrespondence{T} = Dict{Vector{T}, Vector{T}} where T <: Int
     WeightedDiGraph{T <: Int, U <: Number}
 
 Composite types to store all the informations about a DiGraph with weights.
+
+!!! If used to construct directly, it does not check if the `weights` correspond to existing edges in the `dg`.
 """
 mutable struct WeightedDiGraph{T <: Int, U <: Number}
     dg::DiGraph{T}
@@ -51,13 +53,13 @@ Return the digraph of a given `wdg`.
 digraph(wdg::WeightedDiGraph) = wdg.dg
 
 """
-    setoflaternatives(cf::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}) where T <: Int
+    setofalternatives(cf::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}) where T <: Int
 
 Look at the number of alternatives in a choice function or correspondence `cf`.
 
 It might be slow if the number of alternatives is large.
 """
-function setoflaternatives(cf::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}) where T <: Int
+function setofalternatives(cf::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}) where T <: Int
     set = Set{T}()
     for key in keys(cf)
         union!(set, key)
@@ -82,13 +84,13 @@ function overlap(sets::Vector{Vector{T}}) where T <: Number
         return ones(Float64, 1, 1)
     end
     res = zeros(Float64, l, l)
-    for i in 1:l, j in  (i+1):l
+    for i = 1:l, j = (i+1):l
         res[i, j] = length(intersect(sets[i], sets[j])) / length(union(sets[i], sets[j]))
     end
-    for i in 1:l
+    for i = 1:l
         res[i, i] = 1.
     end
-    for i in 1:length(sets), j in 1:(i-1)
+    for i = 1:length(sets), j = 1:(i-1)
         res[i, j] = res[j, i]
     end
     return res
@@ -106,13 +108,13 @@ Create the revealed preferences from an observed choice function `cf`, assuming 
 """
 function revealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
     if n == 0
-        n = setoflaternatives(cf)
+        n = setofalternatives(cf)
     elseif n < 0
-        DomainError(n, "should be positive.")
+        throw(DomainError(n, "should be positive."))
     end    
     result = DiGraph(n)
-    for (key, value) in cf
-        for i in key
+    for (key, value) = cf
+        for i = key
             if !(i == value)
                 add_edge!(result, value, i)
             end
@@ -135,14 +137,14 @@ It assumes that if in the choice function `cf`, we have a set were x in chosen a
 """
 function weakstrictrevealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
     if n == 0
-        n = setoflaternatives(cf)
+        n = setofalternatives(cf)
     elseif n < 0
-        DomainError(n, "should be positive.")
+        throw(DomainError(n, "should be positive."))
     end    
     P = DiGraph(n)
     I = Graph(n)
-    for (S, cS) in cf
-        for y in S
+    for (S, cS) = cf
+        for y = S
             if cS == y
                 continue
             elseif has_edge(P, y, cS)
@@ -170,14 +172,14 @@ It assumes that if in the choice correspondence, we have a set were x in chosen 
 """
 function weakstrictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
     if n == 0
-        n = setoflaternatives(cc)
+        n = setofalternatives(cc)
     elseif n < 0
-        DomainError(n, "should be positive.")
+        throw(DomainError(n, "should be positive."))
     end    
     P = DiGraph(n)
     I = Graph(n)
-    for (S, cS) in cc
-        for y in S, x in cS
+    for (S, cS) = cc
+        for y = S, x = cS
             if x == y
                 continue
             elseif in(y, cS)
@@ -207,13 +209,13 @@ Create the strict revealed preferences from an observed choice correspondence `c
 """
 function strictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
     if n == 0
-        n = setoflaternatives(cc)
+        n = setofalternatives(cc)
     elseif n < 0
-        DomainError(n, "should be positive.")
+        throw(DomainError(n, "should be positive."))
     end    
     result = DiGraph(n)
-    for (S, cS) in cc
-        for x in cS,  y in S
+    for (S, cS) = cc
+        for x = cS,  y = S
             if !in(y, cS)
                 add_edge!(result, x, y)
             end
@@ -234,9 +236,9 @@ Create the revealed indifferences from an observed choice correspondence `cc`.
 """
 function indifferentrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
     if n == 0
-        n = setoflaternatives(cc)
+        n = setofalternatives(cc)
     elseif n < 0
-        DomainError(n, "should be positive.")
+        throw(DomainError(n, "should be positive."))
     end  
     result = Graph(n)
     for cS in values(cc)
@@ -261,9 +263,9 @@ Create the revealed preferences from an observed choice correspondence `cc`, inc
 """
 function revealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
     if n == 0
-        n = setoflaternatives(cc)
+        n = setofalternatives(cc)
     elseif n < 0
-        DomainError(n, "should be positive.")
+        throw(DomainError(n, "should be positive."))
     end  
     P = strictrevealedpreferences(cc, n)
     I = indifferentrevealedpreferences(cc, n)  
@@ -273,7 +275,7 @@ end
 """
     revealedpreferencesweighted(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
 
-Create the revealed preferences from an observed choice function `cf`, weighting each relation by its frequency.
+Create the revealed preferences from an observed choice function `cf`, weighting each relation by the number of time an alternative has been chosen over the other.
 
 # Arguments
 
@@ -282,9 +284,9 @@ Create the revealed preferences from an observed choice function `cf`, weighting
 """
 function revealedpreferencesweighted(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
     if n == 0
-        n = setoflaternatives(cf)
+        n = setofalternatives(cf)
     elseif n < 0
-        DomainError(n, "should be positive.")
+        throw(DomainError(n, "should be positive."))
     end    
     result = WeightedDiGraph(n)
     for (key, value) in cf
@@ -294,8 +296,6 @@ function revealedpreferencesweighted(cf::ChoiceFunction{T}, n::Int = 0) where T 
             RevealedPreferences.weights(result)[value, i] += 1
         end
     end
-    @assert !(sum(weights(result)) == n) "The weights in the preference graph do not add up to $n. PROBLEM."    
-    result.weights = result.weights ./ n
     return result
 end
 
@@ -318,8 +318,8 @@ function strictrevealedpreferences(price::Matrix{T}, quantity::Matrix{T}, aei::N
     expenditures = price .* quantity
     budget = sum(price .* quantity, dims = 2)
     normalizedprice = price ./ budget
-    for i in 1:l
-        for j in  findall(quantity * normalizedprice[i, :] .- aei .<= eps(1.)) # To take into account rounding errors in the computations.
+    for i = 1:l
+        for j = findall(quantity * normalizedprice[i, :] .- aei .<= eps(1.)) # To take into account rounding errors in the computations.
             if i != j
                 add_edge!(result, i, j)
             end
@@ -335,7 +335,7 @@ Compute the transitive core of a directed graph `dg`.
 """
 function transitivecore(dg::DiGraph{T}) where T <: Int
     tc = DiGraph(nv(dg))
-    for e in edges(dg)
+    for e = edges(dg)
         (s,t) = (src(e), dst(e))
         if (issubset(outneighbors(dg, t), outneighbors(dg, s)) && issubset(inneighbors(dg, s), inneighbors(dg, t)))
             add_edge!(tc, e)
@@ -358,9 +358,9 @@ To speed-up computations, provide `n`, the number of alternatives.
 """
 function strictUCR(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
     if n == 0
-        n = setoflaternatives(cf)
+        n = setofalternatives(cf)
     elseif n < 0
-        DomainError(n, "should be positive.")
+        throw(DomainError(n, "should be positive."))
     end    
     result = DiGraph(n)
     forbidden = Set{Tuple{Int, Int}}()
@@ -394,9 +394,9 @@ To speed-up computations, provide `n`, the number of alternatives.
 """
 function strictUCR(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
     if n == 0
-        n = setoflaternatives(cc)
+        n = setofalternatives(cc)
     elseif n < 0
-        DomainError(n, "should be positive.")
+        throw(DomainError(n, "should be positive."))
     end    
     result = DiGraph(n)
     forbidden = Set{Tuple{Int, Int}}()
@@ -477,9 +477,9 @@ Return the preferences revealed with the Fixed Point axio of Aleskerov et al (20
 """
 function fixedpointpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
     if n == 0
-        n = setoflaternatives(cc)
+        n = setofalternatives(cc)
     elseif n < 0
-        DomainError(n, "should be positive.")
+        throw(DomainError(n, "should be positive."))
     end    
     dg = DiGraph(n)
     g = Graph(n)
