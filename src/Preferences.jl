@@ -15,13 +15,13 @@ Alias to define a choice correspondence.
 ChoiceCorrespondence{T} = Dict{Vector{T}, Vector{T}} where T <: Int
 
 """
-    WeightedDiGraph{T<:Int} where T <: Int
+    WeightedDiGraph{T <: Int, U <: Number}
 
 Composite types to store all the informations about a DiGraph with weights.
 """
-mutable struct WeightedDiGraph{T} where T <: Int
+mutable struct WeightedDiGraph{T <: Int, U <: Number}
     dg::DiGraph{T}
-    weights::Matrix{Float64}
+    weights::Matrix{U}
 end
 
 """
@@ -48,7 +48,7 @@ function weights(wdg::WeightedDiGraph) = wdg.weights end
 
 Return the digraph of a given `wdg`.
 """
-digraph(wdg::WeightedDiGraph) = wdg.dg
+function digraph(wdg::WeightedDiGraph) = wdg.dg end
 
 """
     setoflaternatives(cf::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}) where T <: Int
