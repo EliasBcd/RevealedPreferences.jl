@@ -3,7 +3,7 @@ using RevealedPreferences: fixedpoint, cycleswosubcycles!
 using LightGraphs
 using Test
 using IterTools: subsets
-import Statistics: mean
+import StatsBase: mean
 import DataFrames: DataFrame
 
 
@@ -236,6 +236,8 @@ end
     @test numbercycleswosubcycles!(copy(rationaldg), "") == DataFrame()
 end
 
+irrationalcc[[1, 3]] = [1, 3]
+
 @testset "Testing rationality axioms" begin
     @test isWARP(cc) == true
     @test isWARP(irrationalcc) == false
@@ -248,9 +250,9 @@ end
     @test isalpha(cc) == true
     @test isalpha(irrationalcc) == false
     @test isbeta(cc) == true
-    #@test isbeta(irrationalcc) == false
+    @test isbeta(irrationalcc) == false
     @test isdelta(cc) == true
-    #@test isdelta(irrationalcc) == false
+    @test isdelta(irrationalcc) == false
     @test isgamma(cc) == true
     @test isgamma(irrationalcc) == false
     @test isWARNI(cc) == true

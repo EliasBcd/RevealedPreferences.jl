@@ -39,9 +39,9 @@ function isacyclic(dg::DiGraph{T}, g::Graph{T}) where T <: Int
     R = union(P, I)
     transitiveclosure!(R)
     cycles = simplecycles(R)
-    for cyc in cycles
+    for cyc = cycles
         push!(cyc, cyc[1])
-        for i in 1:(length(cyc) - 1) 
+        for i = 1:(length(cyc) - 1) 
             if has_edge(P, Edge(cyc[i], cyc[i+1])) 
                 return false
             end
@@ -76,10 +76,10 @@ Check whether a choice correspondence `cc` violate the ``\\alpha`` axiom of Sen 
 [^Sen1997]: Sen, Amartya K. "Choice Functions and Revealed Preference." *The Review of Economic Studies*, vol. 38, no. 3, 1971, pp. 307–317. JSTOR, [www.jstor.org/stable/2296384](www.jstor.org/stable/2296384).
 """
 function isalpha(cc::ChoiceCorrespondence{T}) where T <: Int
-    for (S, cS) in cc
+    for (S, cS) = cc
         if length(S) > 2
-            for x in cS
-                for (U, cU) in cc
+            for x = cS
+                for (U, cU) = cc
                     if issubset(U, S) & in(x, U) & !in(x, cU) 
                         return false
                     end
@@ -245,13 +245,13 @@ Check if the choice correspondence `cc` satisfies the Jamison Lau Fishburn from 
 [^ABM2007]: ALESKEROV, Fuad, BOUYSSOU, Denis, et MONJARDET, Bernard. *Utility maximization, choice and preference.* Springer Science & Business Media, 2007.
 """
 function isJLF(cc::ChoiceCorrespondence{T}) where T <: Int
-    for (S, cS) in cc
-        for (U, cU) in cc
+    for (S, cS) = cc
+        for (U, cU) = cc
             if (length(U) == 2) | (S == U) | !issubset(S, setdiff(U, cU))
                 continue
             end
-            for (U, cU) in cc
-                if (U == U) | (S == U) | isempty(intersect(cU, U))
+            for (V, cV) in cc
+                if (V == U) | (S == U) | isempty(intersect(cU, U))
                     continue
                 elseif !isempty(intersect(setdiff(S, cS),  cU))
                     return false

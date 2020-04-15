@@ -5,8 +5,7 @@ using IterTools: subsets
 using DataFrames: DataFrame
 
 import GLPK
-import StatsBase.mean
-import StatsBase.countmap
+import StatsBase: mean, countmap
 
 export ChoiceFunction, ChoiceCorrespondence, WeightedDiGraph, weights, digraph, setofalternatives, overlap, revealedpreferences, strictrevealedpreferences, indifferentrevealedpreferences, revealedpreferencesweighted, weakstrictrevealedpreferences, transitivecore, strictUCR,  allchoicesets, allcombinationchoicesets, cyclesbylength, HMI, swapindex, optimalset, isWARP, isWARNI, isoutcast, isFAs, isFP, isOO, isalpha, isbeta, isgamma, isdelta, isJLF, isFA, isacyclic, fixedpointpreferences, Selten, edgedegree, edgesdegree, missingedgesdegree, removeallcycles!, cyclieswosubcycles!, numbercycleswosubcycles!
 
