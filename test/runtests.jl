@@ -271,4 +271,9 @@ irrationalcc[[1, 3]] = [1, 3]
     @test isFA(irrationalcc) == false
 end
 
+@testset "Testing the indices of rationality" begin
+    @test  allcombinationchoicesets(2) == [Vector{Int}(), [[1, 2]]]
+    @test  allcombinationchoicesets(1) == [[]]  
+end
+
 

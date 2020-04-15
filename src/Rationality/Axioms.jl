@@ -98,13 +98,13 @@ Check if a choice correspondence `cc` violates the ``\\beta`` axiom of Sen (1971
 [^Sen1997]: Sen, Amartya K. "Choice Functions and Revealed Preference." *The Review of Economic Studies*, vol. 38, no. 3, 1971, pp. 307–317. JSTOR, [www.jstor.org/stable/2296384](www.jstor.org/stable/2296384).
 """
 function isbeta(cc::ChoiceCorrespondence{T}) where T <: Int
-    for (S, cS) in cc
+    for (S, cS) = cc
         if length(cS) > 1
-            for (U, cU) in cc
+            for (U, cU) = cc
                 if (S == U) | !issubset(S, U)
                     continue
                 end
-                for x in cS, y in cS
+                for x = cS, y = cS
                     if in(x, cU) & !in(y, cU)
                         return false
                     end
@@ -123,13 +123,13 @@ Check if a choice correspondence `cc` violates the ``\\delta`` axiom of Sen (197
 [^Sen1997]: Sen, Amartya K. "Choice Functions and Revealed Preference." *The Review of Economic Studies*, vol. 38, no. 3, 1971, pp. 307–317. JSTOR, [www.jstor.org/stable/2296384](www.jstor.org/stable/2296384).
 """
 function isdelta(cc::ChoiceCorrespondence{T}) where T <: Int
-    for (S, cS) in cc
+    for (S, cS) = cc
         if length(cS) > 1
-            for (U, cU) in cc
+            for (U, cU) = cc
                 if (S == U) | !issubset(S, U)
                     continue
                 end
-                for x in cS
+                for x = cS
                     if [x] == cU 
                         return false
                     end
@@ -152,7 +152,7 @@ function isgamma(cc::ChoiceCorrespondence{T}) where T <: Int
     Ss = collect(keys(cc))
     while !isempty(Ss)
         S = pop!(Ss)
-        for U in Ss
+        for U = Ss
             if !issubset(intersect(cc[S], cc[U]), cc[sort(union(S, U))]) 
                 return false
             end
@@ -176,14 +176,14 @@ ISSN 0899-8256,
 [https://doi.org/10.1016/j.geb.2005.06.007.](https://doi.org/10.1016/j.geb.2005.06.007.)
 """
 function isWARNI(cc::ChoiceCorrespondence{T}) where T <: Int
-    for (S, cS) in cc
-        for y in S
+    for (S, cS) = cc
+        for y = S
             if in(y, cS) 
                 continue
             end
             chosenxs = falses(size(cS))
-            for (i,x) in enumerate(cS)
-                for (U, cU) in cc
+            for (i,x) = enumerate(cS)
+                for (U, cU) = cc
                     if in(y, cU) & in(x, U)
                         chosenxs[i] = true
                     end
@@ -205,8 +205,8 @@ Check if a choice correspondence `cc` satisfies the Outcast axiom from Aleskerov
 [^ABM2007]: ALESKEROV, Fuad, BOUYSSOU, Denis, et MONJARDET, Bernard. *Utility maximization, choice and preference.* Springer Science & Business Media, 2007.
 """
 function isoutcast(cc::ChoiceCorrespondence{T}) where T <: Int
-    for (S, cS) in cc
-        for (U, cU) in cc
+    for (S, cS) = cc
+        for (U, cU) = cc
             if !issubset(U, S) | !issubset(cS, U) 
                 continue
             elseif !(cS == cU)
@@ -228,7 +228,7 @@ function isFAs(cc::ChoiceCorrespondence{T}) where T <: Int
     Ss = collect(keys(cc))
     while !isempty(Ss)
         S = pop!(Ss)
-        for U in Ss    
+        for U = Ss    
             if !isempty(intersect(cc[S], setdiff(U, cc[U]))) & !isempty(intersect(cc[U], setdiff(S, cc[S]))) 
                 return false
             end
@@ -250,7 +250,7 @@ function isJLF(cc::ChoiceCorrespondence{T}) where T <: Int
             if (length(U) == 2) | (S == U) | !issubset(S, setdiff(U, cU))
                 continue
             end
-            for (V, cV) in cc
+            for (V, cV) = cc
                 if (V == U) | (S == V) | isempty(intersect(cU, V))
                     continue
                 elseif !isempty(intersect(setdiff(S, cS),  cV))
@@ -269,21 +269,21 @@ end
 Test the occasional optimality condition of Mira Frick (2016) on the choice correspondence `cc`.
 """
 function isOO(cc::ChoiceCorrespondence{T}) where T <: Int
-    for (S, cS) in cc
+    for (S, cS) = cc
         OOS = false       
-        for x in cS
+        for x = cS
             OOx = true
-            for (U, cU) in cc
+            for (U, cU) = cc
                 if in(x, U) & !isempty(intersect(cU, S)) & !in(x, cU)
                     OOx = false
                 end
             end
             if OOx
-                for(U, cU) in cc
+                for(U, cU) = cc
                     if !in(x, U)
                         continue
                     end
-                    for y in S
+                    for y = S
                         if !in(y, U) & !issubset(cU, cc[sort(union(U, y))]) 
                             OOx = false
                             break
@@ -322,9 +322,9 @@ function isFP(cc::ChoiceCorrespondence{T}) where T <: Int
             continue
         end
         FP = false
-        for x in cc[S]
+        for x = cc[S]
             FPx = true
-            for (U, cU) in cc
+            for (U, cU) = cc
                 if !issubset(U, S) | (U == S) 
                     continue
                 elseif in(x, U) & !in(x, cU) 
@@ -357,16 +357,16 @@ Check if the choice correspondence `cc` satisfies the Functional Acyclicity axio
 function isFA(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
     if n == 0
         set = Set{Int}()
-        for (S, cS) in cc
-            for x in S
+        for (S, cS) = cc
+            for x = S
                 push!(set, x)
             end
         end
         n = length(set)       
     end
     dg = DiGraph(n)
-    for (S, cS) in cc
-        for x in cS, y in S
+    for (S, cS) = cc
+        for x = cS, y = S
             if !in(y, cS)
                 add_edge!(dg, x, y)
             end

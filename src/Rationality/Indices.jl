@@ -97,15 +97,15 @@ end
 """
     allcombinationchoicesets(n::Int)
 
-Compute all possible combination of choice sets to remove from a grand set of alternatives of size `n`.
+Compute all possible combination of choice sets to remove from a grand set of alternatives of size `n`, assuming that choice sets must be of size 2 or greater.
 """
 function allcombinationchoicesets(n::Int)
     rs = Vector{Vector{Int}}()
-    for i in 2:n
+    for i = 2:n
         append!(rs, collect(subsets(collect(1:n), i)))
     end
     rs2 = Vector{Vector{Vector{Int}}}()
-    for i in 0:n
+    for i = 0:n
         append!(rs2, collect(subsets(rs, i)))
     end
     return rs2
