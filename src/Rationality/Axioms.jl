@@ -3,13 +3,13 @@
 
 Return if the choice correspondence `cc` satisfies the Weak Axiom of Revealed Preferences. 
 
-This test is only valid if the choice correspondence is fully observed, that is, if it contains all possible subsets of alternatives.
+!!! The test is only valid if the choice correspondence is fully observed, that is, if it contains all possible subsets of alternatives.
 """
 function isWARP(cc::ChoiceCorrespondence{T}) where T <: Int
-    for (S, cS) in cc
-        for x in S, y in cS
+    for (S, cS) = cc
+        for x = S, y = cS
             if !(x == y)
-                for (U, cU) in cc
+                for (U, cU) = cc
                     if in(y, U) & in(x, cU) & !in(y, cU) 
                         return false
                     end

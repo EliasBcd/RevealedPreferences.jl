@@ -9,6 +9,7 @@ GLPK = "60bf3e95-4087-53dc-ae20-288a0d20c6a6"
 IterTools = "c8e1da08-722c-5040-9ed9-7db0dc04731e"
 LightGraphs = "093fc24a-ae57-5d10-9952-331d41423f4d"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
+Tests = "d0e11250-139b-5467-8e63-e5813d5b6002"
 
 [compat]
 julia = "^1.0"

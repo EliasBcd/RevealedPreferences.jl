@@ -236,5 +236,10 @@ end
     @test numbercycleswosubcycles!(copy(rationaldg), "") == DataFrame()
 end
 
+@testset "Testing rationality axioms" begin
+    @test isWARP(cc) == true
+    @test isWARP(irrationalcc) == false
+    
+end
 
 
