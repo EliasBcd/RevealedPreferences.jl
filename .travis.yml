@@ -12,5 +12,5 @@ notifications:
 
 codecov: true
 
-after_success:
-  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
+fter_success:
+- julia -e 'cd(Pkg.dir("RevealedPreferences")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
