@@ -306,6 +306,8 @@ Create the strict revealed preferences from observed prices `price` and quantiti
 
 Assumes that each period is a row, and that the prices and goods are in the same place for the same period in the matrices.
 
+!!! May not take into account numerical rounding errors correctly
+
 # Arguments
 
 - `price`, the observed prices;
@@ -319,7 +321,7 @@ function strictrevealedpreferences(price::Matrix{T}, quantity::Matrix{T}, aei::N
     budget = sum(price .* quantity, dims = 2)
     normalizedprice = price ./ budget
     for i = 1:l
-        for j = findall(quantity * normalizedprice[i, :] .- aei .<= eps(1.)) # To take into account rounding errors in the computations.
+        for j = findall(quantity * normalizedprice[i, :] .- aei .<= 2 * eps(1.)) # To take into account rounding errors in the computations.
             if i != j
                 add_edge!(result, i, j)
             end
@@ -364,8 +366,8 @@ function strictUCR(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
     end    
     result = DiGraph(n)
     forbidden = Set{Tuple{Int, Int}}()
-    for (key, value) in cf
-        for i in key
+    for (key, value) = cf
+        for i = key
             if i == value
                 continue
             elseif has_edge(result, i, value)
@@ -400,8 +402,8 @@ function strictUCR(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
     end    
     result = DiGraph(n)
     forbidden = Set{Tuple{Int, Int}}()
-    for (key, value) in cc
-        for k in key, v in value
+    for (key, value) = cc
+        for k = key, v = value
             if k == v
                 continue
             elseif has_edge(result, k, v)
@@ -429,7 +431,7 @@ To be correct, directed graph must be obtained from strict revealed preferences.
 """
 function strictUCR(dg::DiGraph)
     res = DiGraph(nv(dg))
-    for e in edges(dg)
+    for e = edges(dg)
         if !has_edge(dg, reverse(e))
             add_edge!(res, e)
         end
@@ -448,13 +450,17 @@ Find the fixed points of a choice correspondence `cc` in a set `S`, according to
 - `S`, the set considered.
 """
 function fixedpoint(cc::ChoiceCorrespondence{T}, S::Vector{T}) where T <: Int
+    if !haskey(cc, S)
+        throw(KeyError(S))
+    end
     result = Vector{T}()
-    for x in S
+    for x = S
         bestx = true
         if in(x, cc[S]) 
-            for (U, cU) in cc
+            for (U, cU) = cc
                 if issubset(U, S) & !(U == S) & in(x, U) & !in(x, cU)
                     bestx = false
+                    break
                 end
             end
             if bestx 
@@ -492,12 +498,12 @@ function fixedpointpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T 
         else
             FP = union(FP, bestS)
         end
-        for x in bestS
+        for x = bestS
             setdiff!(S, FP)
-            for t in S
+            for t = S
                 add_edge!(dg, x, t)
             end
-            for t in bestS
+            for t = bestS
                 if !(t == x) 
                     add_edge!(g, x, t)
                 end

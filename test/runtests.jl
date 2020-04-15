@@ -56,6 +56,16 @@ end
 sucrdg = DiGraph(small_size)
 add_edge!(sucrdg, 2, 3)
 
+irrationalcc = copy(cc)
+irrationalcc[[1, 2]] = [2]
+
+q = [0.2 0.9; 0.9 0.2]
+p = [1/2 1; 2 1]
+
+pqdg = DiGraph(2)
+add_edge!(pqdg, 1, 2)
+add_edge!(pqdg, 2, 1)
+
 @testset "Building blocks for the Module" begin
 
     @testset "Constructors tests" begin
@@ -97,6 +107,8 @@ end
         @test_throws DomainError indifferentrevealedpreferences(cc, -2)      
         @test_throws DomainError strictUCR(cf, -2)
         @test_throws DomainError strictUCR(cc, -2)       
+        @test_throws DomainError fixedpointpreferences(cc, -2)
+        @test_throws KeyError RevealedPreferences.fixedpoint(cc, [graph_size + 1, graph_size + 2])
     end
 
     @testset "Testing empty CFs and CCs" begin
@@ -109,7 +121,8 @@ end
         @test weakstrictrevealedpreferences(Dict{Vector{Int}, Vector{Int}}()) == (DiGraph(0), Graph(0))
         @test weakstrictrevealedpreferences(Dict{Vector{Int}, Int}()) == (DiGraph(0), Graph(0))
         @test strictrevealedpreferences(Dict{Vector{Int}, Vector{Int}}()) == DiGraph(0)    
-        @test indifferentrevealedpreferences(Dict{Vector{Int}, Vector{Int}}()) == Graph(0)            
+        @test indifferentrevealedpreferences(Dict{Vector{Int}, Vector{Int}}()) == Graph(0)    
+        @test fixedpointpreferences(Dict{Vector{Int}, Vector{Int}}()) == (DiGraph(0), Graph(0))        
     end
 
     @testset "Testing the Graph creations" begin
@@ -150,7 +163,22 @@ end
         @test strictUCR(completedg) == DiGraph(graph_size)
         @test strictUCR(rationaldg) == rationaldg
     end
+    
+    @testset "Fixed points" begin
+        @test RevealedPreferences.fixedpoint(cc, grand_set) == [minimum(grand_set)]
+        @test RevealedPreferences.fixedpoint(irrationalcc, grand_set) == []
+        @test fixedpointpreferences(cc) == (rationaldg, Graph(graph_size))
+        @test fixedpointpreferences(irrationalcc) == (DiGraph(graph_size), Graph(graph_size))
+        @test fixedpointpreferences(cc, graph_size) == (rationaldg, Graph(graph_size))
+        @test fixedpointpreferences(irrationalcc, graph_size) == (DiGraph(graph_size), Graph(graph_size))  
+    end
 
+    @testset "Revealed Preferences with prices and quantities" begin
+        @test strictrevealedpreferences(p, q) == pqdg
+        @test strictrevealedpreferences(p, q, 1) == pqdg
+        @test strictrevealedpreferences(p, q, 0) == DiGraph(2) 
+        @test strictrevealedpreferences(p, q, .5) == DiGraph(2)                
+    end
     
 end
 
