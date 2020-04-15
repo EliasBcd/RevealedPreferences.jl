@@ -1,17 +1,14 @@
 """
-```optimalset(dg::DiGraph{T}, set::Vector{T}) where {T<:Int}```
+    optimalset(dg::DiGraph{T}, set::Vector{T}) where {T<:Int}
 
-Look for all the maximal elements of the DiGraph `dg` in `set`.
-Return the set of all maximal elements.
-
-# Arguments
-
-- `dg`, a DiGraph;
-- `set`, a set of the same type than the DiGraph.
+Look for the set of all the maximal elements of the DiGraph `dg` in `set`.
 """
 function optimalset(dg::DiGraph{T}, set::Vector{T}) where {T<:Int}
     result = Vector{T}()
-    for t in set
+    for t = set
+        if t > nv(dg)
+            throw(DomainError(t, "The $set contains values that are not in the digraph."))
+        end
         copyset = copy(set)
         s = pop!(copyset)
         while !has_edge(dg, s, t) & !isempty(copyset)
@@ -26,37 +23,19 @@ end
 
 
 """
-```Selten(cc::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}, dg::DiGraph{T}, cset::Vector{T}, pset::Vector{T}) where T<:Int```
+    Selten(cc::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}, dg::DiGraph{T}, set::Vector{T}) where T<:Int 
 
-Compute the Selten's score of a given digraph and a given choice correspondence on a given set.
-
-# Arguments
-
-- `cc`, a ChoiceFunction or a ChoiceCorrespondence;
-- `dg`, a DiGraph, normally derived from `cc`;
-- `set`, the set on which we are looking for predictions.
+Compute the Selten's score of a given the set `set` for a choice correspondence `cc` and a preference `dg`.
 """
-function Selten(cc::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}, dg::DiGraph{T}, set::Vector{T}) where T<:Int
-    if typeof(cc) <: ChoiceFunction
-        return in(cc[set], set) - length(optimalset(dg, set)) / length(set)
-    else
-        return issubset(cc, set) - length(optimalset(dg, set)) / length(set)
-    end
-end
-
-
+Selten(cc::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}, dg::DiGraph{T}, set::Vector{T})  where T <: Int  = issubset(cc[set], set) - length(optimalset(dg, set)) / length(set)
 
 
 """
-```Selten(cc::Union{ChoiceCorrespondence{T}, ChoiceFunction{T}}, dg::DiGraph{T}, sets::Vector{Vector{T}}, f = mean) where T<:Int```
+    Selten(cc::Union{ChoiceCorrespondence{T}, ChoiceFunction{T}}, dg::DiGraph{T}, sets::Vector{Vector{T}}, f = mean) where T<:Int
 
-Aggregate Selten's score of a given digraph on a given ChoiceFunction or ChoiceCorrespondence for a list of sets, according to function f.
+Compute the Selten's score of a given the set of sets `sets` for a choice correspondence `cc` and a preference `dg`.
 
-# Arguments
-
-- `dg`, a DiGraph;
-- `set`, a vector of sets of the same type than the DiGraph;
-- `f`, a function to use for aggregation, default the mean.
+Aggregate the Selten's score on all the sets according to the function `f`, which is by default the mean.
 """
 function Selten(cc::Union{ChoiceCorrespondence{T}, ChoiceFunction{T}}, dg::DiGraph{T}, sets::Vector{Vector{T}}, f = mean) where T <: Int
     res = Vector{Float64}()

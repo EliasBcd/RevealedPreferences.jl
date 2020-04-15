@@ -1,12 +1,8 @@
 """
-```removeallcycles!(dg::DiGraph{T}) where T <: Int```
+    removeallcycles!(dg::DiGraph{T}) where T <: Int
 
 Remove all the cycles from the digraph `dg`.
 Modify the digraph in place.
-
-# Arguments
-
-- `dg`, a digraph.
 """
 function removeallcycles!(dg::DiGraph{T}) where T <: Int
     sccs = strongly_connected_components(dg)
@@ -22,15 +18,12 @@ function removeallcycles!(dg::DiGraph{T}) where T <: Int
 end
 
 """
-```cycleswosubcycles!(dg::DiGraph{T}) where T <: Int```
+    cycleswosubcycles!(dg::DiGraph{T}) where T <: Int
 
 Remove cycles by increasing length of cycles and return the removed cycles.
+
 Here, a cycle without a subcycle is a cycle which does not share an edge with a cycle of strictly shorter length.
 If two cycles of the same length share an edge, both will be considered as removed cycles.
-
-# Arguments
-
-- `dg`: the digraph considered.
 """
 function cycleswosubcycles!(dg::DiGraph{T}) where T <: Int
     l = 1
@@ -39,9 +32,9 @@ function cycleswosubcycles!(dg::DiGraph{T}) where T <: Int
         l += 1
         cycles = simplecycles_limited_length(dg, l)
         append!(res, cycles)
-        for cycle in cycles
+        for cycle = cycles
             rem_edge!(dg, cycle[end], cycle[1])
-            for i in 2:length(cycle)
+            for i = 2:length(cycle)
                 rem_edge!(dg, cycle[i-1], cycle[i])
             end
         end
@@ -50,22 +43,19 @@ function cycleswosubcycles!(dg::DiGraph{T}) where T <: Int
 end
 
 """
-```numbercycleswosubcycles!(dg::DiGraph{T}, name::AbstractString = "RP") where T <: Int```
+    numbercycleswosubcycles!(dg::DiGraph{T}, name::AbstractString = "RP") where T <: Int
 
-Count the number of cycles without any subcycle, for each given length.
+Count the number of cycles in without any subcycle in `dg`, for each given length.
+
 Here, a cycle without a subcycle is a cycle which does not share an edge with a cycle of strictly shorter length.
 If two cycles of the same length share an edge, both will be considered as removed cycles, and therefore be counted.
-
-# Argument
-
-- `dg`, the digraph considered;
-- `name`, the name we want to use in the DataFrame output, defautl to RP.
+`name` is the name we want to use in the DataFrame output, default to RP.
 """
 function numbercycleswosubcycles!(dg::DiGraph{T}, name::AbstractString = "RP") where T <: Int
     cycleslength = length.(cycleswosubcycles!(dg))
     res = DataFrame()
     if !isempty(cycleslength)
-        for (k, v)  in countmap(cycleslength)
+        for (k, v) = countmap(cycleslength)
             res[!, Symbol("$(name)NOSC$(k)")] = [v]
         end
     end

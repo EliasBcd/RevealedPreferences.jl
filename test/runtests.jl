@@ -1,12 +1,16 @@
 using RevealedPreferences
+using RevealedPreferences: fixedpoint, cycleswosubcycles!
 using LightGraphs
 using Test
 using IterTools: subsets
+import Statistics: mean
+import DataFrames: DataFrame
 
 
 graph_size = 4
 small_size = 3
 grand_set = collect(1:graph_size)
+small_set = collect(1:small_size)
 
 completedg = complete_digraph(graph_size)
 completedglooped = copy(completedg)
@@ -66,6 +70,13 @@ pqdg = DiGraph(2)
 add_edge!(pqdg, 1, 2)
 add_edge!(pqdg, 2, 1)
 
+P = DiGraph(small_size)
+add_edge!(P, 2, 3)
+
+I = Graph(small_size)
+add_edge!(I, 1, 2)
+add_edge!(I, 1, 3)
+
 @testset "Building blocks for the Module" begin
 
     @testset "Constructors tests" begin
@@ -108,7 +119,7 @@ end
         @test_throws DomainError strictUCR(cf, -2)
         @test_throws DomainError strictUCR(cc, -2)       
         @test_throws DomainError fixedpointpreferences(cc, -2)
-        @test_throws KeyError RevealedPreferences.fixedpoint(cc, [graph_size + 1, graph_size + 2])
+        @test_throws KeyError fixedpoint(cc, [graph_size + 1, graph_size + 2])
     end
 
     @testset "Testing empty CFs and CCs" begin
@@ -132,6 +143,7 @@ end
         @test revealedpreferences(cc) == (rationaldg, Graph(graph_size))
         @test weakstrictrevealedpreferences(cc) == (rationaldg, Graph(graph_size))
         @test weakstrictrevealedpreferences(cf) == (rationaldg, Graph(graph_size))
+        @test weakstrictrevealedpreferences(smallcf) == (P, I)
         @test weakstrictrevealedpreferences(cc, graph_size) == (rationaldg, Graph(graph_size))
         @test weakstrictrevealedpreferences(cf, graph_size) == (rationaldg, Graph(graph_size))
         @test strictrevealedpreferences(cc, graph_size) == rationaldg
@@ -165,8 +177,8 @@ end
     end
     
     @testset "Fixed points" begin
-        @test RevealedPreferences.fixedpoint(cc, grand_set) == [minimum(grand_set)]
-        @test RevealedPreferences.fixedpoint(irrationalcc, grand_set) == []
+        @test fixedpoint(cc, grand_set) == [minimum(grand_set)]
+        @test fixedpoint(irrationalcc, grand_set) == []
         @test fixedpointpreferences(cc) == (rationaldg, Graph(graph_size))
         @test fixedpointpreferences(irrationalcc) == (DiGraph(graph_size), Graph(graph_size))
         @test fixedpointpreferences(cc, graph_size) == (rationaldg, Graph(graph_size))
@@ -179,10 +191,50 @@ end
         @test strictrevealedpreferences(p, q, 0) == DiGraph(2) 
         @test strictrevealedpreferences(p, q, .5) == DiGraph(2)                
     end
+end
+
+@testset "Test the `Predictions.jl` file" begin
+    @testset "Testing the `optimalset` function" begin
+        @test optimalset(rationaldg, grand_set) == [1]
+        @test optimalset(P, small_set) == [1, 2]
+        @test_throws DomainError optimalset(pqdg, small_set)
+        @test optimalset(pqdg, [1, 2]) == []
+    end
+    
+    @testset "Testing the Selten's score" begin
+        @test Selten(cc, rationaldg, grand_set) == ((graph_size - 1) /graph_size)
+        @test Selten(cf, rationaldg, grand_set) == ((graph_size - 1) /graph_size)
+        @test Selten(cf, rationaldg, collect(keys(cc))) ≈ 7/12
+        @test Selten(cc, rationaldg, collect(keys(cc))) ≈ 7/12
+        @test Selten(cc, rationaldg, collect(keys(cc)), minimum) == 1/2
+        @test Selten(cc, rationaldg, collect(keys(cc)), maximum) == ((graph_size - 1) / graph_size)
+    end
     
 end
 
+@testset "Test the `Degree.jl` file" begin
+    @test edgedegree(rationaldg, Edge(1, 2), -, mean) == 2.
+    @test edgedegree(rationaldg, Edge(1, 2), -, minimum) == 1.
+    @test edgedegree(rationaldg, Edge(1, 2), /, mean) ≈ 5/6
+    @test edgedegree(rationaldg, Edge(1, 2), /, minimum) ≈ 2/3
+    @test edgedegree(Graph(graph_size), Edge(1, 2), -, mean) == 0
+    @test_throws DomainError edgedegree(rationaldg, Edge(graph_size, graph_size + 1), -, mean)
+    @test edgesdegree(rationaldg, [Edge(1, 2), Edge(1, 3)]) == 1.5
+    @test edgesdegree(rationaldg, [Edge(1, 2), Edge(1, 3)], -, mean, minimum) == 1
+    @test missingedgesdegree(rationaldg) == 0
+    @test missingedgesdegree(sucrdg) == 0
+    @test missingedgesdegree(sucrdg, -, minimum, mean) == -0.5
+    @test missingedgesdegree(sucrdg, -, minimum, minimum) == -1
+end
 
+@testset "Test the `Cyclicity.jl` file" begin
+    @test removeallcycles!(copy(rationaldg)) == rationaldg
+    @test removeallcycles!(copy(completedg)) == DiGraph(graph_size)
+    @test cycleswosubcycles!(copy(rationaldg)) == []
+    @test cycleswosubcycles!(copy(completedg)) == collect(subsets(grand_set, 2))
+    @test numbercycleswosubcycles!(copy(completedg), "") == DataFrame(NOSC2 = [6])
+    @test numbercycleswosubcycles!(copy(rationaldg), "") == DataFrame()
+end
 
 
 

@@ -1,5 +1,5 @@
 """
-```edgedegree(dg::Union{Graph{T}, DiGraph{T}}, e::Edge{T}, f1, f2) where T <: Int```
+    edgedegree(dg::Union{Graph{T}, DiGraph{T}}, e::Edge{T}, f1, f2) where T <: Int
 
 Compute the relation between in degree and out degree for a given vertice using function `f1`.
 Aggregate the source and the destination degrees of an edge using function `f2`.
@@ -13,7 +13,10 @@ Aggregate the source and the destination degrees of an edge using function `f2`.
 """
 function edgedegree(dg::Union{Graph{T}, DiGraph{T}}, e::Edge{T}, f1, f2) where T <: Int
     res = Vector{Float64}()
-    for x in [src(e), dst(e)]
+    if (src(e) > nv(dg)) | (dst(e) > nv(dg))
+        throw(DomainError(e, "At least one of the source or the destination of the graph are not in the graph."))
+    end
+    for x = [src(e), dst(e)]
         if f1 == /
             if degree(dg, x) > 0
                 push!(res, f1(outdegree(dg, x), degree(dg, x)))
@@ -30,9 +33,10 @@ function edgedegree(dg::Union{Graph{T}, DiGraph{T}}, e::Edge{T}, f1, f2) where T
 end
 
 """
-```edgesdegree(dg::Union{Graph{T}, DiGraph{T}}, elist::Vector{Edge{T}}, f1 = -, f2 = mean, f3 = mean) where T <: Int```
+    edgesdegree(dg::Union{Graph{T}, DiGraph{T}}, elist::Vector{Edge{T}}, f1 = -, f2 = mean, f3 = mean) where T <: Int
 
 Compute the relation between in degree and out degree for a given vertice using function `f1`.
+
 Aggregate the source and the destination degrees of an edge using function `f2`.
 Aggregaste over all edges using function `f3.`
 
@@ -46,7 +50,7 @@ Aggregaste over all edges using function `f3.`
 """
 function edgesdegree(dg::Union{Graph{T}, DiGraph{T}}, elist::Vector{Edge{T}}, f1 = -, f2 = mean, f3 = mean) where T <: Int
     res = Vector{Float64}()
-    for e in elist
+    for e = elist
         push!(res, edgedegree(dg, e, f1, f2))
     end
     if isempty(res)
@@ -57,9 +61,10 @@ function edgesdegree(dg::Union{Graph{T}, DiGraph{T}}, elist::Vector{Edge{T}}, f1
 end
 
 """
-```missingedgesdegree(dg::Union{Graph{T}, DiGraph{T}},f1 = -, f2 = mean, f3 = mean; refdg::DiGraph = dg) where T <: Int```
+    missingedgesdegree(dg::Union{Graph{T}, DiGraph{T}},f1 = -, f2 = mean, f3 = mean; refdg::DiGraph = dg) where T <: Int
 
 Aggregate the relation between indegree and outdegree of missing edges compared to a complete graph of the same size.
+
 Compute the relation between in degree and out degree for a given vertice using function `f1`.
 Aggregate the source and the destination degrees of an edge using function `f2`.
 Aggregaste over all edges using function `f3.`
