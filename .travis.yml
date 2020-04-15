@@ -1,3 +1,4 @@
+codecov: true
 language: julia
 os:
   - linux
@@ -10,7 +11,7 @@ julia:
 notifications:
   email: false
 
-codecov: true
 
-fter_success:
+
+after_success:
 - julia -e 'cd(Pkg.dir("RevealedPreferences")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'

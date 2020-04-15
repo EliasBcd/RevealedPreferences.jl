@@ -262,7 +262,7 @@ irrationalcc[[1, 3]] = [1, 3]
     @test isFAs(cc) == true
     @test isFAs(irrationalcc) == false
     @test isJLF(cc) == true
-    #@test isJLF(irrationalcc) == false
+    @test isJLF(irrationalcc) == false
     @test isOO(cc) == true
     @test isOO(irrationalcc) == false
     @test isFP(cc) == true

@@ -251,9 +251,9 @@ function isJLF(cc::ChoiceCorrespondence{T}) where T <: Int
                 continue
             end
             for (V, cV) in cc
-                if (V == U) | (S == U) | isempty(intersect(cU, U))
+                if (V == U) | (S == V) | isempty(intersect(cU, V))
                     continue
-                elseif !isempty(intersect(setdiff(S, cS),  cU))
+                elseif !isempty(intersect(setdiff(S, cS),  cV))
                     return false
                 end
             end
