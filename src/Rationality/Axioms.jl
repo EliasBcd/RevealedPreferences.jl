@@ -364,7 +364,7 @@ function isFA(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
         end
         n = length(set)       
     end
-    dg = DiGraph(ndg)
+    dg = DiGraph(n)
     for (S, cS) in cc
         for x in cS, y in S
             if !in(y, cS)

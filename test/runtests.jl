@@ -251,6 +251,22 @@ end
     #@test isbeta(irrationalcc) == false
     @test isdelta(cc) == true
     #@test isdelta(irrationalcc) == false
+    @test isgamma(cc) == true
+    @test isgamma(irrationalcc) == false
+    @test isWARNI(cc) == true
+    @test isWARNI(irrationalcc) == false
+    @test isoutcast(cc) == true
+    @test isoutcast(irrationalcc) == false
+    @test isFAs(cc) == true
+    @test isFAs(irrationalcc) == false
+    @test isJLF(cc) == true
+    #@test isJLF(irrationalcc) == false
+    @test isOO(cc) == true
+    @test isOO(irrationalcc) == false
+    @test isFP(cc) == true
+    @test isFP(irrationalcc) == false
+    @test isFA(cc) == true
+    @test isFA(irrationalcc) == false
 end
 
 
