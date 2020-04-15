@@ -239,7 +239,18 @@ end
 @testset "Testing rationality axioms" begin
     @test isWARP(cc) == true
     @test isWARP(irrationalcc) == false
-    
+    @test isacyclic(P, I) == false    
+    rem_edge!(I, 1, 3)
+    @test isacyclic(P, I) == true
+    add_edge!(P, 3, 2)
+    @test isacyclic(P, I) == false    
+    @test isacyclic(cf) == true
+    @test isalpha(cc) == true
+    @test isalpha(irrationalcc) == false
+    @test isbeta(cc) == true
+    #@test isbeta(irrationalcc) == false
+    @test isdelta(cc) == true
+    #@test isdelta(irrationalcc) == false
 end
 
 
