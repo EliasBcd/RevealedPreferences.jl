@@ -1,0 +1,13 @@
+language: julia
+os:
+  - linux
+  - windows
+  
+julia:
+  - 1.0
+  - 1.4
+  
+notifications:
+  email: false
+
+codecov: true

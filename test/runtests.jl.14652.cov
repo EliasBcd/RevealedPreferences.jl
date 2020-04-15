@@ -1,0 +1,177 @@
+        - using RevealedPreferences
+        - using LightGraphs
+        - using Test
+        - using IterTools: subsets
+        - 
+        - 
+        - graph_size = 4
+        - small_size = 3
+        - grand_set = collect(1:graph_size)
+        - 
+        - completedg = complete_digraph(graph_size)
+        - completedglooped = copy(completedg)
+        - for i = 1:graph_size
+        4     add_edge!(completedglooped, i, i)
+        - end
+        - we = ones(graph_size, graph_size)
+        - 
+        - wdg = WeightedDiGraph(completedglooped, we)
+        - 
+        - df = Dict{Vector{Int}, Int}()
+        - cf = ChoiceFunction{Int}()
+        - dc = Dict{Vector{Int}, Vector{Int}}()
+        - cc = ChoiceCorrespondence{Int}()
+        - 
+        - 
+        - 
+        - for i = 2:graph_size
+        3     for s = subsets(grand_set, i)
+       11         c = minimum(s)
+       11         df[s] = c
+       11         dc[s] = [c]
+       11         cf[s] = c
+       11         cc[s] = [c]
+        -     end
+        - end
+        -    
+        - rationaldg = DiGraph(graph_size)
+        - for i = 1:graph_size, j = (i+1):graph_size
+        6     add_edge!(rationaldg, i, j)
+        - end
+        - 
+        - rationalweight = [0 4. 4. 4.; 0 0 2 2; 0 0 0 1; 0 0 0 0]
+        - 
+        - smallcf = ChoiceFunction{Int}()
+        - smallcc = ChoiceCorrespondence{Int}()
+        - 
+        - smallcf[[1, 2]] = 2
+        - smallcf[[1, 3]] = 3
+        - smallcf[[2, 3]] = 2
+        - smallcf[[1, 2, 3]] = 1
+        - 
+        - for (k, v) = smallcf
+        4     smallcc[k] = [v]
+        - end
+        - 
+        - sucrdg = DiGraph(small_size)
+        - add_edge!(sucrdg, 2, 3)
+        - 
+        - irrationalcc = copy(cc)
+        - irrationalcc[[1, 2]] = [2]
+        - 
+        - 
+        - @testset "Building blocks for the Module" begin
+        - 
+        2     @testset "Constructors tests" begin
+        1         @test digraph(WeightedDiGraph(0)) ==  digraph(WeightedDiGraph(DiGraph(0), zeros(Float64, 0, 0)))
+        1         @test RevealedPreferences.weights(WeightedDiGraph(0)) ==  RevealedPreferences.weights(WeightedDiGraph(DiGraph(0), zeros(Float64, 0, 0)))
+        1         @test digraph(wdg) == completedglooped
+        1         @test RevealedPreferences.weights(wdg) == we
+        1         @test cf == df
+        1         @test cc == dc
+        1         @test cc != cf
+        1         @test typeof(cc) == typeof(dc)
+        1         @test typeof(cf) == typeof(df)
+        1         @test typeof(cc) != typeof(cf)
+        -     end
+        - 
+        -     @testset "Test function `setofalternatives`" begin
+        1         @test graph_size == setofalternatives(cc)
+        1         @test graph_size == setofalternatives(cf)
+        -     end
+        - end
+        -     
+        - @testset "Some functions" begin
+        2     @testset "Testing the overlap function" begin
+        1         @test overlap(Vector{Vector{Int}}()) == zeros(Float64, 0, 0)
+        1         @test overlap([[0]]) == ones(Float64, 1, 1)
+        1         @test overlap([[0], [1]]) == [1. 0; 0 1]
+        1         @test overlap([[1], [1]]) == ones(Float64, 2, 2)
+        -     end
+        - end
+        - 
+        - @testset "Testing the revealed preferences functions" begin
+        2     @testset "DomainError for revealed preferences functions" begin
+        1         @test_throws DomainError revealedpreferences(cf, -2)
+        1         @test_throws DomainError revealedpreferencesweighted(cf, -2)        
+        1         @test_throws DomainError revealedpreferences(cc, -2)
+        1         @test_throws DomainError weakstrictrevealedpreferences(cc, -2)
+        1         @test_throws DomainError weakstrictrevealedpreferences(cf, -2)
+        1         @test_throws DomainError strictrevealedpreferences(cc, -2)
+        1         @test_throws DomainError indifferentrevealedpreferences(cc, -2)      
+        1         @test_throws DomainError strictUCR(cf, -2)
+        1         @test_throws DomainError strictUCR(cc, -2)       
+        1         @test_throws DomainError fixedpointpreferences(cc, -2)
+        1         @test_throws KeyError RevealedPreferences.fixedpoint(cc, [graph_size + 1, graph_size + 2])
+        -     end
+        - 
+        -     @testset "Testing empty CFs and CCs" begin
+        1         @test revealedpreferences(Dict{Vector{Int}, Int}()) == DiGraph(0)
+        1         @test digraph(revealedpreferencesweighted(Dict{Vector{Int}, Int}())) == digraph(WeightedDiGraph(DiGraph(0), zeros(Float64, 0, 0)))
+        1         @test digraph(revealedpreferencesweighted(Dict{Vector{Int}, Int}())) == digraph(WeightedDiGraph(0))    
+        1         @test RevealedPreferences.weights(revealedpreferencesweighted(Dict{Vector{Int}, Int}())) == RevealedPreferences.weights(WeightedDiGraph(DiGraph(0), zeros(Float64, 0, 0)))
+        1         @test RevealedPreferences.weights(revealedpreferencesweighted(Dict{Vector{Int}, Int}())) == RevealedPreferences.weights(WeightedDiGraph(0)) 
+        1         @test revealedpreferences(Dict{Vector{Int}, Vector{Int}}()) == (DiGraph(0), Graph(0))
+        1         @test weakstrictrevealedpreferences(Dict{Vector{Int}, Vector{Int}}()) == (DiGraph(0), Graph(0))
+        1         @test weakstrictrevealedpreferences(Dict{Vector{Int}, Int}()) == (DiGraph(0), Graph(0))
+        1         @test strictrevealedpreferences(Dict{Vector{Int}, Vector{Int}}()) == DiGraph(0)    
+        1         @test indifferentrevealedpreferences(Dict{Vector{Int}, Vector{Int}}()) == Graph(0)    
+        1         @test fixedpointpreferences(Dict{Vector{Int}, Vector{Int}}()) == (DiGraph(0), Graph(0))        
+        -     end
+        - 
+        -     @testset "Testing the Graph creations" begin
+        1         @test revealedpreferences(cf) == rationaldg
+        1         @test revealedpreferences(cf, graph_size) == rationaldg
+        1         @test revealedpreferences(cc, graph_size) == (rationaldg, Graph(graph_size))
+        1         @test revealedpreferences(cc) == (rationaldg, Graph(graph_size))
+        1         @test weakstrictrevealedpreferences(cc) == (rationaldg, Graph(graph_size))
+        1         @test weakstrictrevealedpreferences(cf) == (rationaldg, Graph(graph_size))
+        1         @test weakstrictrevealedpreferences(cc, graph_size) == (rationaldg, Graph(graph_size))
+        1         @test weakstrictrevealedpreferences(cf, graph_size) == (rationaldg, Graph(graph_size))
+        1         @test strictrevealedpreferences(cc, graph_size) == rationaldg
+        1         @test strictrevealedpreferences(cc) == rationaldg
+        1         @test indifferentrevealedpreferences(cc) == Graph(graph_size)
+        1         res = revealedpreferencesweighted(cf)
+        1         @test RevealedPreferences.weights(res) == rationalweight
+        1         @test digraph(res) == rationaldg
+        -     end
+        -     
+        -     @testset "The transitive core" begin
+        1         @test transitivecore(completedglooped) == completedglooped
+        1         @test transitivecore(rationaldg) == rationaldg
+        1         @test transitivecore(completedg) == DiGraph(graph_size)        
+        -     end
+        -     
+        -     @testset "The Strict Unambiguous Choice Relation" begin
+        1         @test strictUCR(cf) == rationaldg
+        1         @test strictUCR(cc) == rationaldg
+        1         @test strictUCR(smallcf) == sucrdg
+        1         @test strictUCR(smallcc) == sucrdg
+        1         @test strictUCR(cf, graph_size) == rationaldg
+        1         @test strictUCR(cc, graph_size) == rationaldg
+        1         @test strictUCR(smallcf, small_size) == sucrdg
+        1         @test strictUCR(smallcc, small_size) == sucrdg
+        1         smallcc[[1, 2, 3]] = [1, 3]
+        1         @test strictUCR(smallcc) == DiGraph(small_size)
+        1         @test strictUCR(smallcc, small_size) == DiGraph(small_size)
+        1         @test strictUCR(completedg) == DiGraph(graph_size)
+        1         @test strictUCR(rationaldg) == rationaldg
+        -     end
+        -     
+        -     @testset "Fixed points" begin
+        1         @test RevealedPreferences.fixedpoint(cc, grand_set) == [minimum(grand_set)]
+        1         @test RevealedPreferences.fixedpoint(irrationalcc, grand_set) == []
+        1         @test fixedpointpreferences(cc) == (rationaldg, Graph(graph_size))
+        1         @test fixedpointpreferences(irrationalcc) == (DiGraph(graph_size), Graph(graph_size))
+        1         @test fixedpointpreferences(cc, graph_size) == (rationaldg, Graph(graph_size))
+        1         @test fixedpointpreferences(irrationalcc, graph_size) == (DiGraph(graph_size), Graph(graph_size))                
+        -     end
+        - 
+        -     
+        - end
+        - 
+        - 
+        - 
+        - 
+        - 
+        - 
