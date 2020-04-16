@@ -70,7 +70,19 @@ function rem_edge!(wdg::WeightedDiGraph{T}, e::Edge{T}) where T <: Int
     return wdg
 end
     
+"""
+    ==(wdg1::WeightedDiGraph{T}, wdg2::WeightedDiGraph{T}) where T <: Int
+
+Equality operator.
+"""
 ==(wdg1::WeightedDiGraph{T}, wdg2::WeightedDiGraph{T}) where T <: Int = ((digraph(wdg1) == digraph(wdg2)) & (RevealedPreferences.weights(wdg1) == RevealedPreferences.weights(wdg2)))
+
+"""
+    !=(wdg1::WeightedDiGraph{T}, wdg2::WeightedDiGraph{T}) where T <: Int
+
+Inequality operator.
+"""
+!=(wdg1::WeightedDiGraph{T}, wdg2::WeightedDiGraph{T}) where T <: Int = !(wdg1 == wdg2)
 
 """
     setofalternatives(cf::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}) where T <: Int
@@ -117,6 +129,20 @@ function overlap(sets::Vector{Vector{T}}) where T <: Number
 end
 
 """
+    graphsize(cf::Union{ChoiceCorrespondence{T}, ChoiceFunction{T}}, n::Int = 0) where T <: Int
+
+If needed, compute the number of vertices needed for creating a graph associated with the ChoiceFunction or ChoiceCorrespondence.
+"""
+function graphsize(cf::Union{ChoiceCorrespondence{T}, ChoiceFunction{T}}, n::Int = 0) where T <: Int
+    if n == 0
+        n = setofalternatives(cf)
+    elseif n < 0
+        throw(DomainError(n, "should be positive."))
+    end   
+    return n
+end
+
+"""
     revealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
 
 Create the revealed preferences from an observed choice function `cf`, assuming that the preferences revealed are strict.
@@ -127,11 +153,7 @@ Create the revealed preferences from an observed choice function `cf`, assuming 
 - `n`, the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
 function revealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
-    if n == 0
-        n = setofalternatives(cf)
-    elseif n < 0
-        throw(DomainError(n, "should be positive."))
-    end    
+    n = graphsize(cf, n)
     result = DiGraph(n)
     for (key, value) = cf
         for i = key
@@ -156,11 +178,7 @@ It assumes that if in the choice function `cf`, we have a set were x in chosen a
 - `n`, the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
 function weakstrictrevealedpreferences(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
-    if n == 0
-        n = setofalternatives(cf)
-    elseif n < 0
-        throw(DomainError(n, "should be positive."))
-    end    
+    n = graphsize(cf, n) 
     P = DiGraph(n)
     I = Graph(n)
     for (S, cS) = cf
@@ -191,11 +209,7 @@ It assumes that if in the choice correspondence, we have a set were x in chosen 
 - `n`, the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
 function weakstrictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
-    if n == 0
-        n = setofalternatives(cc)
-    elseif n < 0
-        throw(DomainError(n, "should be positive."))
-    end    
+    n = graphsize(cc, n)
     P = DiGraph(n)
     I = Graph(n)
     for (S, cS) = cc
@@ -228,11 +242,7 @@ Create the strict revealed preferences from an observed choice correspondence `c
 - `n`, the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
 function strictrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
-    if n == 0
-        n = setofalternatives(cc)
-    elseif n < 0
-        throw(DomainError(n, "should be positive."))
-    end    
+    n = graphsize(cc, n)
     result = DiGraph(n)
     for (S, cS) = cc
         for x = cS,  y = S
@@ -255,11 +265,7 @@ Create the revealed indifferences from an observed choice correspondence `cc`.
 - `n`, the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
 function indifferentrevealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
-    if n == 0
-        n = setofalternatives(cc)
-    elseif n < 0
-        throw(DomainError(n, "should be positive."))
-    end  
+    n = graphsize(cc, n)
     result = Graph(n)
     for cS in values(cc)
         for x in cS,  y in cS
@@ -282,11 +288,7 @@ Create the revealed preferences from an observed choice correspondence `cc`, inc
 - `n`, the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
 function revealedpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
-    if n == 0
-        n = setofalternatives(cc)
-    elseif n < 0
-        throw(DomainError(n, "should be positive."))
-    end  
+    n = graphsize(cc, n)
     P = strictrevealedpreferences(cc, n)
     I = indifferentrevealedpreferences(cc, n)  
     return P, I
@@ -303,11 +305,7 @@ Create the revealed preferences from an observed choice function `cf`, weighting
 - `n`, the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
 function revealedpreferencesweighted(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
-    if n == 0
-        n = setofalternatives(cf)
-    elseif n < 0
-        throw(DomainError(n, "should be positive."))
-    end    
+    n = graphsize(cf, n)
     result = WeightedDiGraph(n)
     for (key, value) in cf
         for i in key
@@ -379,11 +377,7 @@ To speed-up computations, provide `n`, the number of alternatives.
 - `n`, the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
 function strictUCR(cf::ChoiceFunction{T}, n::Int = 0) where T <: Int
-    if n == 0
-        n = setofalternatives(cf)
-    elseif n < 0
-        throw(DomainError(n, "should be positive."))
-    end    
+    n = graphsize(cf, n)
     result = DiGraph(n)
     forbidden = Set{Tuple{Int, Int}}()
     for (key, value) = cf
@@ -415,11 +409,7 @@ To speed-up computations, provide `n`, the number of alternatives.
 - `n`, the number of alternatives. If no value is provided, look at all the alternatives in the choice function, which is much slower.
 """
 function strictUCR(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
-    if n == 0
-        n = setofalternatives(cc)
-    elseif n < 0
-        throw(DomainError(n, "should be positive."))
-    end    
+    n = graphsize(cc, n)
     result = DiGraph(n)
     forbidden = Set{Tuple{Int, Int}}()
     for (key, value) = cc
@@ -502,11 +492,7 @@ Return the preferences revealed with the Fixed Point axio of Aleskerov et al (20
 - `n`, the number of alternatives considered.
 """
 function fixedpointpreferences(cc::ChoiceCorrespondence{T}, n::Int = 0) where T <: Int
-    if n == 0
-        n = setofalternatives(cc)
-    elseif n < 0
-        throw(DomainError(n, "should be positive."))
-    end    
+    n = graphsize(cc, n) 
     dg = DiGraph(n)
     g = Graph(n)
     S = collect(1:n)

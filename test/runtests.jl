@@ -137,6 +137,8 @@ add_edge!(g2, 1, 3)
         rem_edge!(digraph(wdg2), Edge(1, 1))
         RevealedPreferences.weights(wdg2)[1, 1] = 0
         @test rem_edge!(newwdg, Edge(1,1)) == wdg2
+        @test wdg2 != wdg
+        
     end
 end
 
@@ -151,17 +153,14 @@ end
 end
 
 @testset "Testing the revealed preferences functions" begin
-    @testset "DomainError for revealed preferences functions" begin
-        @test_throws DomainError revealedpreferences(cf, -2)
-        @test_throws DomainError revealedpreferencesweighted(cf, -2)        
-        @test_throws DomainError revealedpreferences(cc, -2)
-        @test_throws DomainError weakstrictrevealedpreferences(cc, -2)
-        @test_throws DomainError weakstrictrevealedpreferences(cf, -2)
-        @test_throws DomainError strictrevealedpreferences(cc, -2)
-        @test_throws DomainError indifferentrevealedpreferences(cc, -2)      
-        @test_throws DomainError strictUCR(cf, -2)
-        @test_throws DomainError strictUCR(cc, -2)       
-        @test_throws DomainError fixedpointpreferences(cc, -2)
+    @testset "graph size computations" begin
+        @test graphsize(cf, 2) == 2
+        @test_throws DomainError graphsize(cf, -1)
+        @test graphsize(cf) == graph_size
+        @test graphsize(cc) == graph_size
+    end
+    
+    @testset "KeyError for fixed point functions" begin
         @test_throws KeyError fixedpoint(cc, [graph_size + 1, graph_size + 2])
     end
 
@@ -178,19 +177,14 @@ end
     end
 
     @testset "Testing the Graph creations" begin
-        @test revealedpreferences(cf) == rationaldg
         @test revealedpreferences(cf, graph_size) == rationaldg
         @test revealedpreferences(cc, graph_size) == (rationaldg, Graph(graph_size))
-        @test revealedpreferences(cc) == (rationaldg, Graph(graph_size))
-        @test weakstrictrevealedpreferences(cc) == (rationaldg, Graph(graph_size))
-        @test weakstrictrevealedpreferences(cf) == (rationaldg, Graph(graph_size))
-        @test weakstrictrevealedpreferences(smallcf) == (P, I)
+        @test weakstrictrevealedpreferences(smallcf, small_size) == (P, I)
         @test weakstrictrevealedpreferences(cc, graph_size) == (rationaldg, Graph(graph_size))
         @test weakstrictrevealedpreferences(cf, graph_size) == (rationaldg, Graph(graph_size))
         @test weakstrictrevealedpreferences(cc2, 3) == (dg2, g2)
         @test strictrevealedpreferences(cc, graph_size) == rationaldg
-        @test strictrevealedpreferences(cc) == rationaldg
-        @test indifferentrevealedpreferences(cc) == Graph(graph_size)
+        @test indifferentrevealedpreferences(cc, graph_size) == Graph(graph_size)
         res = revealedpreferencesweighted(cf)
         @test res == WeightedDiGraph(rationaldg, rationalweight)
     end
@@ -202,16 +196,11 @@ end
     end
     
     @testset "The Strict Unambiguous Choice Relation" begin
-        @test strictUCR(cf) == rationaldg
-        @test strictUCR(cc) == rationaldg
-        @test strictUCR(smallcf) == sucrdg
-        @test strictUCR(smallcc) == sucrdg
         @test strictUCR(cf, graph_size) == rationaldg
         @test strictUCR(cc, graph_size) == rationaldg
         @test strictUCR(smallcf, small_size) == sucrdg
         @test strictUCR(smallcc, small_size) == sucrdg
         smallcc[[1, 2, 3]] = [1, 3]
-        @test strictUCR(smallcc) == DiGraph(small_size)
         @test strictUCR(smallcc, small_size) == DiGraph(small_size)
         @test strictUCR(completedg) == DiGraph(graph_size)
         @test strictUCR(rationaldg) == rationaldg
@@ -220,8 +209,6 @@ end
     @testset "Fixed points" begin
         @test fixedpoint(cc, grand_set) == [minimum(grand_set)]
         @test fixedpoint(irrationalcc, grand_set) == []
-        @test fixedpointpreferences(cc) == (rationaldg, Graph(graph_size))
-        @test fixedpointpreferences(irrationalcc) == (DiGraph(graph_size), Graph(graph_size))
         @test fixedpointpreferences(cc, graph_size) == (rationaldg, Graph(graph_size))
         @test fixedpointpreferences(irrationalcc, graph_size) == (DiGraph(graph_size), Graph(graph_size))  
     end
@@ -323,7 +310,8 @@ end
     @test_throws DomainError allcombinationchoicesets(-1)    
     @test allchoicesets(2) == [[1, 2]]
     @test_throws DomainError allchoicesets(2, 3)
-    @test_throws DomainError allchoicesets(2, -2)
+    @test_throws DomainError allchoicesets(2, -1)
+    @test Set(collect(keys(cc))) == Set(allchoicesets(graph_size))
     @test HMI(cf, allcombinationchoicesets(graph_size)) == 0
     @test HMI(smallcf, allcombinationchoicesets(small_size)) == 1 / 4
     @test swapindex(revealedpreferencesweighted(cf, graph_size)) == (0., true)
