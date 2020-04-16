@@ -1,11 +1,13 @@
 """
     swapindex(wdg::WeightedDiGraph)
 
-Compute the swap index of Apesteguia and Ballester (2016) for the digraph `digraph(wdg)` where the frequency of each relation is given by the Matrix `weights(wdg)`.
+Compute the swap index of Apesteguia and Ballester (2015) for the digraph `digraph(wdg)`.[^AB2015]
 
-# Arguments
+The frequency of each relation is given by the Matrix `weights(wdg)`.
 
-- `wdg`, the preference graph and its associated weights.
+### References
+
+[^AB2015]: Jose Apesteguia and Miguel A. Ballester, "A Measure of Rationality and Welfare," *Journal of Political Economy* vol 123, no. 6 (December 2015): 1278-1310. doi: [10.1086/683838](https://doi.org/10.1086/683838)
 """
 function swapindex(wdg::WeightedDiGraph)
     if !is_cyclic(digraph(wdg))
@@ -18,20 +20,20 @@ function swapindex(wdg::WeightedDiGraph)
     lp = GLPK.Prob()
     GLPK.set_obj_dir(lp, GLPK.MIN)    
     GLPK.add_rows(lp, cyclessize)
-    for i in 1:cyclessize
+    for i = 1:cyclessize
         GLPK.set_row_bnds(lp, i, GLPK.LO, 1, 0)
     end
     GLPK.add_cols(lp, removalsize)
-    for i in 1:removalsize
+    for i = 1:removalsize
         GLPK.set_col_kind(lp, i, GLPK.BV)
-        GLPK.set_obj_coef(lp, i, weights(dg)[src(alledges[i]), dst(alledges[i])])  
+        GLPK.set_obj_coef(lp, i, weights(wdg)[src(alledges[i]), dst(alledges[i])])  
     end
     ia = Vector{Int}()
     ja = Vector{Int}()
     ar = Vector{Int}()
-    for i in 1:cyclessize
-        for k in 1:(length(cycles[i]) - 1)
-            for j in 1:removalsize
+    for i = 1:cyclessize
+        for k = 1:(length(cycles[i]) - 1)
+            for j = 1:removalsize
                 if((src(alledges[j]) == cycles[i][k]) & (dst(alledges[j]) == cycles[i][k+1]))
                     push!(ia, i)
                     push!(ja, j)
@@ -40,7 +42,7 @@ function swapindex(wdg::WeightedDiGraph)
                 end
             end
         end
-        for j in 1:removalsize
+        for j = 1:removalsize
             if((src(alledges[j]) == cycles[i][end]) & (dst(alledges[j]) == cycles[i][1]))
                 push!(ia, i)
                 push!(ja, j)
@@ -56,18 +58,18 @@ function swapindex(wdg::WeightedDiGraph)
     parm.msg_lev = GLPK.MSG_OFF
     GLPK.intopt(lp, parm)      
     edgetoremove = Vector{Int}()
-    for i in 1:removalsize
+    for i = 1:removalsize
         if GLPK.mip_col_val(lp, i) == 1
             push!(edgetoremove, i)
         end
     end
     result = 0.
-    copydg = copy(dg)
-    for e in alledges[edgetoremove]
-        result += weights(dg)[src(e), dst(e)]
-        rem_edge!(copydg, e)
+    copywdg = copy(wdg)
+    for e = alledges[edgetoremove]
+        result += weights(wdg)[src(e), dst(e)]
+        rem_edge!(copywdg, e)
     end
-    return result, !is_cyclic(copydg)
+    return result, !is_cyclic(digraph(copywdg))
 end
 
 """
@@ -88,7 +90,7 @@ function allchoicesets(n::Int, floor::Int = 2)
     end
     X = collect(1:n)
     result = [X]
-    for i in floor:(n-1)
+    for i = floor:(n-1)
         append!(result, collect(subsets(X, i)))
     end
     return result
@@ -133,7 +135,7 @@ function HMI(cf::ChoiceFunction{T}, removablesets::Vector{Vector{Vector{T}}}) wh
         return 0.
     end
     result = maximum(length.(removablesets))
-    for s in removablesets
+    for s = removablesets
         if length(s) >= result
             continue
         end

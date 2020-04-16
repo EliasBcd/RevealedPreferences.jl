@@ -42,7 +42,7 @@ end
 
 Return the weights of a given `wdg`.
 """
-weights(wdg::WeightedDiGraph) = wdg.weights
+weights(wdg::WeightedDiGraph{T}) where T <: Int = wdg.weights
 
 
 """
@@ -50,7 +50,27 @@ weights(wdg::WeightedDiGraph) = wdg.weights
 
 Return the digraph of a given `wdg`.
 """
-digraph(wdg::WeightedDiGraph) = wdg.dg
+digraph(wdg::WeightedDiGraph{T}) where T <: Int = wdg.dg
+
+"""
+    copy(wdg::WeightedDiGraph{T}) where T <: Int
+
+Copy the WeightedDiGraph `wdg`.
+"""
+copy(wdg::WeightedDiGraph{T}) where T <: Int = WeightedDiGraph(copy(digraph(wdg)), copy(RevealedPreferences.weights(wdg)))
+
+"""
+    rem_edge!(wdg::WeightedDiGraph{T}, e::Edge{T}) where T <: Int
+
+Remove edge `e` from the `wdg`: the edge from the digraph as well as setting the corresponding weight to 0.
+"""
+function rem_edge!(wdg::WeightedDiGraph{T}, e::Edge{T}) where T <: Int
+    rem_edge!(digraph(wdg), e)
+    RevealedPreferences.weights(wdg)[src(e), dst(e)] = 0
+    return wdg
+end
+    
+==(wdg1::WeightedDiGraph{T}, wdg2::WeightedDiGraph{T}) where T <: Int = ((digraph(wdg1) == digraph(wdg2)) & (RevealedPreferences.weights(wdg1) == RevealedPreferences.weights(wdg2)))
 
 """
     setofalternatives(cf::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}) where T <: Int

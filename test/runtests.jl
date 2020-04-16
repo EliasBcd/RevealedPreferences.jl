@@ -129,7 +129,17 @@ add_edge!(g2, 1, 3)
         @test graph_size == setofalternatives(cc)
         @test graph_size == setofalternatives(cf)
     end
+    
+    @testset "Functions on WeightdDiGraph" begin
+        newwdg = copy(wdg)
+        @test newwdg == wdg
+        wdg2 = copy(wdg)
+        rem_edge!(digraph(wdg2), Edge(1, 1))
+        RevealedPreferences.weights(wdg2)[1, 1] = 0
+        @test rem_edge!(newwdg, Edge(1,1)) == wdg2
+    end
 end
+
     
 @testset "Some functions" begin
     @testset "Testing the overlap function" begin
@@ -158,9 +168,7 @@ end
     @testset "Testing empty CFs and CCs" begin
         @test revealedpreferences(Dict{Vector{Int}, Int}()) == DiGraph(0)
         @test digraph(revealedpreferencesweighted(Dict{Vector{Int}, Int}())) == digraph(WeightedDiGraph(DiGraph(0), zeros(Float64, 0, 0)))
-        @test digraph(revealedpreferencesweighted(Dict{Vector{Int}, Int}())) == digraph(WeightedDiGraph(0))    
-        @test RevealedPreferences.weights(revealedpreferencesweighted(Dict{Vector{Int}, Int}())) == RevealedPreferences.weights(WeightedDiGraph(DiGraph(0), zeros(Float64, 0, 0)))
-        @test RevealedPreferences.weights(revealedpreferencesweighted(Dict{Vector{Int}, Int}())) == RevealedPreferences.weights(WeightedDiGraph(0)) 
+        @test revealedpreferencesweighted(Dict{Vector{Int}, Int}()) == WeightedDiGraph(0)
         @test revealedpreferences(Dict{Vector{Int}, Vector{Int}}()) == (DiGraph(0), Graph(0))
         @test weakstrictrevealedpreferences(Dict{Vector{Int}, Vector{Int}}()) == (DiGraph(0), Graph(0))
         @test weakstrictrevealedpreferences(Dict{Vector{Int}, Int}()) == (DiGraph(0), Graph(0))
@@ -184,8 +192,7 @@ end
         @test strictrevealedpreferences(cc) == rationaldg
         @test indifferentrevealedpreferences(cc) == Graph(graph_size)
         res = revealedpreferencesweighted(cf)
-        @test RevealedPreferences.weights(res) == rationalweight
-        @test digraph(res) == rationaldg
+        @test res == WeightedDiGraph(rationaldg, rationalweight)
     end
     
     @testset "The transitive core" begin
@@ -319,6 +326,8 @@ end
     @test_throws DomainError allchoicesets(2, -2)
     @test HMI(cf, allcombinationchoicesets(graph_size)) == 0
     @test HMI(smallcf, allcombinationchoicesets(small_size)) == 1 / 4
+    @test swapindex(revealedpreferencesweighted(cf, graph_size)) == (0., true)
+    @test swapindex(wdg) == (10., true)
 end
 
 
