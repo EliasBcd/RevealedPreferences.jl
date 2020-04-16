@@ -5,7 +5,17 @@ using Test
 using IterTools: subsets
 import StatsBase: mean
 import DataFrames: DataFrame
+import LightGraphs: ncycles_n_i, max_simple_cycles
 
+function ncycles_n_i(n::Int, i::Int, self::Bool = false)
+    if !self & (i == 1)
+        return 0
+    else
+        return binomial(big(n), big(i)) * factorial(i - 1)
+    end
+end
+
+max_simple_cycles(n::Integer, self::Bool = false) = sum(x -> ncycles_n_i(n, x, self), 1:n)
 
 graph_size = 4
 small_size = 3
@@ -18,8 +28,17 @@ for i = 1:graph_size
     add_edge!(completedglooped, i, i)
 end
 we = ones(graph_size, graph_size)
-
 wdg = WeightedDiGraph(completedglooped, we)
+
+ncyclescompletedg = DataFrame([[ncycles_n_i(graph_size, i)] for i = 1:graph_size], Symbol.(["$i" for i = 1:graph_size]))
+ncyclescompletedg[!, :ALL] .= max_simple_cycles(graph_size) 
+
+ncyclescompletedglooped = copy(ncyclescompletedg)
+ncyclescompletedglooped[!, Symbol("1")] .= ncycles_n_i(graph_size, 1, true)
+ncyclescompletedglooped[!, :ALL] .+= ncycles_n_i(graph_size, 1, true)
+ncyclesrationaldg = DataFrame([[0] for i = 1:graph_size], Symbol.(["$i" for i = 1:graph_size]))
+ncyclesrationaldg[!, :ALL] .= 0
+
 
 df = Dict{Vector{Int}, Int}()
 cf = ChoiceFunction{Int}()
@@ -77,6 +96,20 @@ I = Graph(small_size)
 add_edge!(I, 1, 2)
 add_edge!(I, 1, 3)
 
+cc2 = ChoiceCorrespondence{Int}(
+    [1, 2] => [1],
+    [1, 3] => [3],
+    [2, 3] => [2],
+    [1, 2, 3] => [1, 2],
+)
+    
+dg2 = DiGraph(3)
+add_edge!(dg2, 2, 3)
+g2 = Graph(3)
+add_edge!(g2, 1, 2)
+add_edge!(g2, 1, 3)
+    
+    
 @testset "Building blocks for the Module" begin
 
     @testset "Constructors tests" begin
@@ -146,6 +179,7 @@ end
         @test weakstrictrevealedpreferences(smallcf) == (P, I)
         @test weakstrictrevealedpreferences(cc, graph_size) == (rationaldg, Graph(graph_size))
         @test weakstrictrevealedpreferences(cf, graph_size) == (rationaldg, Graph(graph_size))
+        @test weakstrictrevealedpreferences(cc2, 3) == (dg2, g2)
         @test strictrevealedpreferences(cc, graph_size) == rationaldg
         @test strictrevealedpreferences(cc) == rationaldg
         @test indifferentrevealedpreferences(cc) == Graph(graph_size)
@@ -218,6 +252,7 @@ end
     @test edgedegree(rationaldg, Edge(1, 2), /, mean) ≈ 5/6
     @test edgedegree(rationaldg, Edge(1, 2), /, minimum) ≈ 2/3
     @test edgedegree(Graph(graph_size), Edge(1, 2), -, mean) == 0
+    @test edgedegree(Graph(graph_size), Edge(1, 2), /, mean) == 0
     @test_throws DomainError edgedegree(rationaldg, Edge(graph_size, graph_size + 1), -, mean)
     @test edgesdegree(rationaldg, [Edge(1, 2), Edge(1, 3)]) == 1.5
     @test edgesdegree(rationaldg, [Edge(1, 2), Edge(1, 3)], -, mean, minimum) == 1
@@ -234,6 +269,9 @@ end
     @test cycleswosubcycles!(copy(completedg)) == collect(subsets(grand_set, 2))
     @test numbercycleswosubcycles!(copy(completedg), "") == DataFrame(NOSC2 = [6])
     @test numbercycleswosubcycles!(copy(rationaldg), "") == DataFrame()
+    @test cyclesbylength(completedglooped, "") == ncyclescompletedglooped
+    @test cyclesbylength(completedg, "") == ncyclescompletedg
+    @test cyclesbylength(rationaldg, "") == ncyclesrationaldg
 end
 
 irrationalcc[[1, 3]] = [1, 3]
@@ -273,7 +311,14 @@ end
 
 @testset "Testing the indices of rationality" begin
     @test  allcombinationchoicesets(2) == [Vector{Int}(), [[1, 2]]]
-    @test  allcombinationchoicesets(1) == [[]]  
+    @test_throws DomainError allcombinationchoicesets(1, -1)
+    @test_throws DomainError allcombinationchoicesets(1)
+    @test_throws DomainError allcombinationchoicesets(-1)    
+    @test allchoicesets(2) == [[1, 2]]
+    @test_throws DomainError allchoicesets(2, 3)
+    @test_throws DomainError allchoicesets(2, -2)
+    @test HMI(cf, allcombinationchoicesets(graph_size)) == 0
+    @test HMI(smallcf, allcombinationchoicesets(small_size)) == 1 / 4
 end
 
 

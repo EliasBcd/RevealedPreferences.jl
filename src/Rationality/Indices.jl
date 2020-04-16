@@ -82,9 +82,9 @@ Compute all choice sets of size larger than `floor` for a given number of altern
 """
 function allchoicesets(n::Int, floor::Int = 2)
     if floor < 0
-        DomainError(floor, "should be positive.")
+        throw(DomainError(floor, "should be positive."))
     elseif n < floor
-        DomainError(n, "should be greater or equal than floor $floor.")
+        throw(DomainError(n, "should be greater or equal than floor $floor."))
     end
     X = collect(1:n)
     result = [X]
@@ -99,9 +99,14 @@ end
 
 Compute all possible combination of choice sets to remove from a grand set of alternatives of size `n`, assuming that choice sets must be of size 2 or greater.
 """
-function allcombinationchoicesets(n::Int)
+function allcombinationchoicesets(n::Int, floor::Int = 2)
+    if n < floor
+        throw(DomainError(n, "should be greater than the `floor` $floor"))
+    elseif floor < 0
+        throw(DomainError(floor, "cannot be negative!"))
+    end        
     rs = Vector{Vector{Int}}()
-    for i = 2:n
+    for i = floor:n
         append!(rs, collect(subsets(collect(1:n), i)))
     end
     rs2 = Vector{Vector{Vector{Int}}}()
@@ -111,22 +116,6 @@ function allcombinationchoicesets(n::Int)
     return rs2
 end
 
-"""
-    cyclesbylength(dg::DiGraph; pref::AbstractString = "RP")
-
-Return the number of cycles of each length in a digraph `dg`.
-
-# Arguments
-
-- `dg`, the preference relation;
-- `pref`, the name of the preference relation, defaults to "RP".
-"""
-function cyclesbylength(dg::DiGraph; pref::AbstractString = "RP")
-    cyclelength = simplecycleslength(dg)
-    res = DataFrame([[i] for i in cyclelength[1]], Symbol.(["$(pref)$i" for i=1:length(cyclelength[1])]))
-    res[!, Symbol("$(pref)ALL")] .= cyclelength[2]
-    return res
-end
 
 """
     HMI(cf::ChoiceFunction{T}, removablesets::Vector{Vector{Vector{T}}}) where T <: Int
@@ -140,23 +129,21 @@ Use a brute force algorithm to do so.
 - `removablesets`, the set of all possible combination of sets that can be removed.
 """
 function HMI(cf::ChoiceFunction{T}, removablesets::Vector{Vector{Vector{T}}}) where T <: Int
-    rp = RP(cf)
-    if !is_cyclic(rp)
+    if isacyclic(cf)
         return 0.
     end
-    result = maximum.(length(removablesets))
+    result = maximum(length.(removablesets))
     for s in removablesets
-        if length(s) >= min
+        if length(s) >= result
             continue
         end
         ch = copy(cf)
-        for ss in s
-            delete!(ch, Set(ss))
+        for ss = s
+            delete!(ch, ss)
         end
-        rp = RP(ch)
-        if !is_cyclic(rp)
+        if isacyclic(ch)
             result = length(s)
         end
     end
-    return result / nchoices
+    return result / length(cf)
 end
