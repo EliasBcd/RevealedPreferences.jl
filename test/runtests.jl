@@ -76,6 +76,10 @@ for (k, v) = smallcf
     smallcc[k] = [v]
 end
 
+smallcc2 = copy(smallcc)
+smallcc2[[2, 3]] = [2, 3]
+smallcc2[[1, 2, 3]] = [2, 3]
+
 sucrdg = DiGraph(small_size)
 add_edge!(sucrdg, 2, 3)
 
@@ -108,7 +112,12 @@ add_edge!(dg2, 2, 3)
 g2 = Graph(3)
 add_edge!(g2, 1, 2)
 add_edge!(g2, 1, 3)
-    
+
+smalldg = DiGraph(3)
+add_edge!(smalldg, 2, 1)
+add_edge!(smalldg, 3, 1)
+smallg = Graph(3)
+add_edge!(smallg, 2, 3)
     
 @testset "Building blocks for the Module" begin
 
@@ -211,6 +220,7 @@ end
         @test fixedpoint(irrationalcc, grand_set) == []
         @test fixedpointpreferences(cc, graph_size) == (rationaldg, Graph(graph_size))
         @test fixedpointpreferences(irrationalcc, graph_size) == (DiGraph(graph_size), Graph(graph_size))  
+        @test fixedpointpreferences(smallcc2, small_size) == (smalldg, smallg)
     end
 
     @testset "Revealed Preferences with prices and quantities" begin
