@@ -75,6 +75,6 @@ Return the number of cycles of each length in a digraph `dg`.
 function cyclesbylength(dg::DiGraph, pref::AbstractString = "RP")
     cyclelength = simplecycleslength(dg)
     res = DataFrame([[i] for i = cyclelength[1]], Symbol.(["$(pref)$i" for i = 1:length(cyclelength[1])]))
-    res[!, Symbol("$(pref)ALL")] .= cyclelength[2]
+    res[!, Symbol("$(pref)ALL")] = repeat([cyclelength[2]], size(res, 1))
     return res
 end

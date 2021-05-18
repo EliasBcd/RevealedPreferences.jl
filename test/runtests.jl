@@ -5,7 +5,7 @@ using Test
 using IterTools: subsets
 import StatsBase: mean
 import DataFrames: DataFrame
-import LightGraphs: ncycles_n_i, max_simple_cycles
+import LightGraphs: ncycles_n_i, maxsimplecycles
 
 function ncycles_n_i(n::Int, i::Int, self::Bool = false)
     if !self & (i == 1)
@@ -15,7 +15,7 @@ function ncycles_n_i(n::Int, i::Int, self::Bool = false)
     end
 end
 
-max_simple_cycles(n::Integer, self::Bool = false) = sum(x -> ncycles_n_i(n, x, self), 1:n)
+maxsimplecycles(n::Integer, self::Bool = false) = sum(x -> ncycles_n_i(n, x, self), 1:n)
 
 graph_size = 4
 small_size = 3
@@ -31,13 +31,13 @@ we = ones(graph_size, graph_size)
 wdg = WeightedDiGraph(completedglooped, we)
 
 ncyclescompletedg = DataFrame([[ncycles_n_i(graph_size, i)] for i = 1:graph_size], Symbol.(["$i" for i = 1:graph_size]))
-ncyclescompletedg[!, :ALL] .= max_simple_cycles(graph_size) 
+ncyclescompletedg[!, :ALL] = repeat([maxsimplecycles(graph_size)], size(ncyclescompletedg, 1))
 
 ncyclescompletedglooped = copy(ncyclescompletedg)
-ncyclescompletedglooped[!, Symbol("1")] .= ncycles_n_i(graph_size, 1, true)
-ncyclescompletedglooped[!, :ALL] .+= ncycles_n_i(graph_size, 1, true)
+ncyclescompletedglooped[!, Symbol("1")] = repeat([ncycles_n_i(graph_size, 1, true)], size(ncyclescompletedglooped, 1))
+ncyclescompletedglooped[!, :ALL] += repeat([ncycles_n_i(graph_size, 1, true)], size(ncyclescompletedglooped, 1))
 ncyclesrationaldg = DataFrame([[0] for i = 1:graph_size], Symbol.(["$i" for i = 1:graph_size]))
-ncyclesrationaldg[!, :ALL] .= 0
+ncyclesrationaldg[!, :ALL] = zeros(Int, size(ncyclesrationaldg, 1))
 
 
 df = Dict{Vector{Int}, Int}()
