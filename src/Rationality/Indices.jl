@@ -17,20 +17,20 @@ function swapindex(wdg::WeightedDiGraph)
     cyclessize = length(cycles)
     removalsize = ne(digraph(wdg))
     alledges = collect(edges(digraph(wdg)))
-    lp = GLPK.Prob()
-    GLPK.set_obj_dir(lp, GLPK.MIN)    
-    GLPK.add_rows(lp, cyclessize)
+    lp = GLPK.glp_create_prob()
+    GLPK.glp_set_obj_dir(lp, GLPK.GLP_MIN)    
+    GLPK.glp_add_rows(lp, cyclessize)
     for i = 1:cyclessize
-        GLPK.set_row_bnds(lp, i, GLPK.LO, 1, 0)
+        GLPK.glp_set_row_bnds(lp, i, GLPK.GLP_LO, 1, 0)
     end
-    GLPK.add_cols(lp, removalsize)
+    GLPK.glp_add_cols(lp, removalsize)
     for i = 1:removalsize
-        GLPK.set_col_kind(lp, i, GLPK.BV)
-        GLPK.set_obj_coef(lp, i, weights(wdg)[src(alledges[i]), dst(alledges[i])])  
+        GLPK.glp_set_col_kind(lp, i, GLPK.GLP_BV)
+        GLPK.glp_set_obj_coef(lp, i, weights(wdg)[src(alledges[i]), dst(alledges[i])])  
     end
-    ia = Vector{Int}()
-    ja = Vector{Int}()
-    ar = Vector{Int}()
+    ia = Vector{Cint}()
+    ja = Vector{Cint}()
+    ar = Vector{Cdouble}()
     for i = 1:cyclessize
         for k = 1:(length(cycles[i]) - 1)
             for j = 1:removalsize
@@ -51,15 +51,15 @@ function swapindex(wdg::WeightedDiGraph)
             end
         end
     end
-    GLPK.load_matrix(lp, ia, ja, ar) 
-    parm = GLPK.IntoptParam()
-    GLPK.init_iocp(parm)
-    parm.presolve = GLPK.ON  
-    parm.msg_lev = GLPK.MSG_OFF
-    GLPK.intopt(lp, parm)      
+    GLPK.glp_load_matrix(lp, length(ar), GLPK.offset(ia), GLPK.offset(ja), GLPK.offset(ar)) 
+    parm = GLPK.glp_iocp()
+    GLPK.glp_init_iocp(parm)
+    parm.presolve = GLPK.GLP_ON  
+    parm.msg_lev = GLPK.GLP_MSG_OFF
+    GLPK.glp_intopt(lp, parm)      
     edgetoremove = Vector{Int}()
     for i = 1:removalsize
-        if GLPK.mip_col_val(lp, i) == 1
+        if GLPK.glp_mip_col_val(lp, i) == 1
             push!(edgetoremove, i)
         end
     end
