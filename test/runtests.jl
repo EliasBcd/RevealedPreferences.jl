@@ -1,11 +1,11 @@
 using RevealedPreferences
 using RevealedPreferences: fixedpoint, cycleswosubcycles!
-using LightGraphs
+using Graphs
 using Test
 using IterTools: subsets
 import StatsBase: mean
 import DataFrames: DataFrame
-import LightGraphs: ncycles_n_i, maxsimplecycles
+import Graphs: ncycles_n_i, maxsimplecycles
 
 function ncycles_n_i(n::Int, i::Int, self::Bool = false)
     if !self & (i == 1)

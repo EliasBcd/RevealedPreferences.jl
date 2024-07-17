@@ -78,13 +78,6 @@ Equality operator.
 ==(wdg1::WeightedDiGraph{T}, wdg2::WeightedDiGraph{T}) where T <: Int = ((digraph(wdg1) == digraph(wdg2)) & (RevealedPreferences.weights(wdg1) == RevealedPreferences.weights(wdg2)))
 
 """
-    !=(wdg1::WeightedDiGraph{T}, wdg2::WeightedDiGraph{T}) where T <: Int
-
-Inequality operator.
-"""
-!=(wdg1::WeightedDiGraph{T}, wdg2::WeightedDiGraph{T}) where T <: Int = !(wdg1 == wdg2)
-
-"""
     setofalternatives(cf::Union{ChoiceFunction{T}, ChoiceCorrespondence{T}}) where T <: Int
 
 Look at the number of alternatives in a choice function or correspondence `cf`.

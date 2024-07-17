@@ -34,7 +34,8 @@ function cycleswosubcycles!(dg::DiGraph{T}) where T <: Int
         append!(res, cycles)
         for cycle = cycles
             rem_edge!(dg, cycle[end], cycle[1])
-            for i = 2:length(cycle)
+            for i in eachindex(cycle)
+                i == 1 && continue
                 rem_edge!(dg, cycle[i-1], cycle[i])
             end
         end
