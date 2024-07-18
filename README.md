@@ -1,7 +1,7 @@
 # RevealedPreferences.jl
 
-[![Build Status](https://travis-ci.com/EliasBcd/RevealedPreferences.jl.svg?branch=master)](https://travis-ci.com/EliasBcd/RevealedPreferences.jl)
-[![codecov.io](http://codecov.io/github/EliasBcd/RevealedPreferences.jl/coverage.svg?branch=master)](http://codecov.io/github/EliasBcd/RevealedPreferences.jl?branch=master)
+![Build Status](https://github.com/EliasBcd/RevealedPreferences.jl/actions/workflows/CI.yml/badge.svg?branch=master)
+[![codecov.io](https://codecov.io/github/EliasBcd/RevealedPreferences.jl/coverage.svg?branch=master)](https://app.codecov.io/github/EliasBcd/RevealedPreferences.jl?branch=master)
 
 A library for revealed preferences analysis using Julia.
 The analysis can start from a choice function, a choice correspondence or prices and quantities.
