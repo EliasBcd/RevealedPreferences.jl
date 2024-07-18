@@ -1,7 +1,7 @@
 name = "RevealedPreferences"
 uuid = "fae3f90e-61e0-11e9-203b-a1b4e36eae6f"
 authors = ["Elias Bouacida <elias@bouacida.fr>"]
-version = "0.3.1"
+version = "0.3.0"
 
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
