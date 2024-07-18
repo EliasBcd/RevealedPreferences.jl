@@ -194,6 +194,7 @@ end
         @test weakstrictrevealedpreferences(cc2, 3) == (dg2, g2)
         @test strictrevealedpreferences(cc, graph_size) == rationaldg
         @test indifferentrevealedpreferences(cc, graph_size) == Graph(graph_size)
+        @test indifferentrevealedpreferences(smallcc2, small_size) == smallg
         res = revealedpreferencesweighted(cf)
         @test res == WeightedDiGraph(rationaldg, rationalweight)
     end
@@ -279,6 +280,8 @@ end
 end
 
 irrationalcc[[1, 3]] = [1, 3]
+irrationalcc2 = copy(irrationalcc)
+irrationalcc2[[1, 2, 3]] = [1, 2, 3]
 
 @testset "Testing rationality axioms" begin
     @test isWARP(cc) == true
@@ -293,8 +296,10 @@ irrationalcc[[1, 3]] = [1, 3]
     @test isalpha(irrationalcc) == false
     @test isbeta(cc) == true
     @test isbeta(irrationalcc) == false
+    @test isbeta(irrationalcc2) == false
     @test isdelta(cc) == true
     @test isdelta(irrationalcc) == false
+    @test isdelta(irrationalcc2) == false
     @test isgamma(cc) == true
     @test isgamma(irrationalcc) == false
     @test isWARNI(cc) == true
